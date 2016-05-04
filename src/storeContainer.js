@@ -1,0 +1,257 @@
+// Based on Redux connect()
+
+import autobind from "autobind-decorator";
+import hoistStatics from "hoist-non-react-statics";
+import invariant from "invariant";
+import isPlainObject from "lodash.isplainobject";
+import { Component, createElement, PropTypes } from "react";
+
+import shallowEqual from "f.lux/utils/shallowEqual";
+
+
+const defaultMergeProps = (stateProps, parentProps, containerProps) => ({
+		...parentProps,
+		...stateProps,
+		...containerProps,
+	});
+
+function getDisplayName(WrappedComponent) {
+	return WrappedComponent.displayName || WrappedComponent.name || 'Component'
+}
+
+// Helps track hot reloading.
+var nextVersion = 0;
+
+
+export default function storeContainer(mapShadowToProps, mergeProps, options = {}) {
+	const shouldSubscribe = Boolean(mapShadowToProps);
+	const finalMergeProps = mergeProps || defaultMergeProps
+	const checkMergedEquals = finalMergeProps !== defaultMergeProps
+	const { pure = true, withRef = false } = options;
+
+	// Helps track hot reloading.
+	const version = nextVersion++;
+
+	function computeMergedProps(stateProps, parentProps, containerProps) {
+		const mergedProps = finalMergeProps(stateProps, parentProps, containerProps);
+
+		invariant(
+				isPlainObject(mergedProps),
+				'`mergeProps` must return an object. Instead received %s.',
+				mergedProps
+			);
+
+		return mergedProps;
+	}
+
+	return function wrapWithContainer(WrappedComponent) {
+		class StoreContainer extends Component {
+			constructor(props, context) {
+				super(props, context);
+
+				this.version = version;
+				this.store = props.store || context.store;
+
+				invariant(this.store, `Could not find f.lux Store in the context or props of ` +
+					`<${this.constructor.displayName}>. Either wrap the root component in a <Provider>, or explicitly ` +
+					`pass "store" as a prop to <${this.constructor.displayName}>.`
+				)
+
+				this.state = { shadow: this.store.shadow };
+			}
+
+			componentDidMount() {
+				this.trySubscribe();
+			}
+
+			componentWillReceiveProps(nextProps) {
+				if (!pure || !shallowEqual(nextProps, this.props)) {
+					this.haveOwnPropsChanged = true;
+				}
+			}
+
+			componentWillUnmount() {
+				this.tryUnsubscribe()
+				this.clearCache()
+			}
+
+			shouldComponentUpdate() {
+				return !pure || this.haveOwnPropsChanged || this.hasShadowChanged;
+			}
+
+			clearCache() {
+				this.dispatchProps = null
+				this.stateProps = null
+				this.haveOwnPropsChanged = true
+				this.hasShadowChanged = true
+				this.renderedElement = null
+				this.finalMapShadowToProps = null
+			}
+
+			computeShadowProps(store, props) {
+				if (!this.finalMapShadowToProps) {
+					return this.configureFinalMapShadow(store, props);
+				}
+
+				const shadow = store.shadow;
+				const shadowProps = this.doShadowPropsDependOnOwnProps ?
+					this.finalMapShadowToProps(shadow, props) :
+					this.finalMapShadowToProps(shadow);
+
+				return shadowProps;
+			}
+
+			configureFinalMapShadow(store, props) {
+				const mappedShadow = mapShadowToProps(store.shadow, props);
+				const isFactory = typeof mappedShadow === 'function'
+
+				this.finalMapShadowToProps = isFactory ?mappedShadow :mapShadowToProps;
+				this.doShadowPropsDependOnOwnProps = this.finalMapShadowToProps.length !== 1;
+
+				return isFactory ?this.computeShadowProps(store.shadow, props) :mappedShadow;
+			}
+
+			getWrappedInstance() {
+				invariant(
+						withRef, 
+						`To access the wrapped instance, you need to specify  { withRef: true } as the fourth `+
+							`argument of the connect() call.`
+					);
+
+				return this.refs.wrappedInstance;
+			}
+
+			@autobind
+			handleChange() {
+				if (!this.subscribed) { return }
+
+				const prevShadow = this.state.shadow;
+				const shadow = this.store.shadow;
+
+				if (!pure || prevShadow !== shadow) {
+					this.hasShadowChanged = true;
+					this.setState({ shadow });
+				}
+			}
+
+			isSubscribed() {
+				return this.subscribed;
+			}
+
+			trySubscribe() {
+				if (shouldSubscribe && !this.subscribed) {
+					this.store.subscribe(this.handleChange);
+					this.subscribed = true;
+					this.handleChange();
+				}
+			}
+
+			tryUnsubscribe() {
+				if (this.subscribed) {
+					this.store.unsubscribe();
+					this.subscribed = false;
+				}
+			}
+
+			updateMergedPropsIfNeeded() {
+				const containerProps = { store: this.store }
+				const nextMergedProps = computeMergedProps(this.shadowProps, this.props, containerProps);
+
+				if (this.mergedProps && checkMergedEquals && shallowEqual(nextMergedProps, this.mergedProps)) {
+					return false;
+				}
+
+				this.mergedProps = nextMergedProps;
+
+				return true;
+			}
+
+			updateShadowPropsIfNeeded() {
+				const nextShadowProps = this.computeShadowProps(this.store, this.props);
+
+				if (this.shadowProps && shallowEqual(nextShadowProps, this.shadowProps)) {
+					return false;
+				}
+
+				this.shadowProps = nextShadowProps;
+
+				return true;
+			}
+
+			render() {
+				const {
+						haveOwnPropsChanged,
+						hasShadowChanged,
+						renderedElement
+					} = this;
+
+				this.haveOwnPropsChanged = false;
+				this.hasShadowChanged = false;
+
+				// 
+				var shouldUpdateShadowProps = true;
+
+				if (pure && renderedElement) {
+					shouldUpdateShadowProps = hasShadowChanged || (haveOwnPropsChanged && this.doShadowPropsDependOnOwnProps);
+				}
+
+				// Map the current state to the desired shadow properties
+				var haveShadowPropsChanged = false
+
+				if (shouldUpdateShadowProps) {
+					haveShadowPropsChanged = this.updateShadowPropsIfNeeded()
+				}
+
+				// Merge the shadow properties in with the component properties and store/shadow
+				var haveMergedPropsChanged = true;
+
+				if (haveShadowPropsChanged || haveOwnPropsChanged) {
+					haveMergedPropsChanged = this.updateMergedPropsIfNeeded()
+				} else {
+					haveMergedPropsChanged = false
+				}
+
+				if (!haveMergedPropsChanged && renderedElement) {
+
+					return renderedElement
+				}
+
+				if (withRef) {
+					this.renderedElement = createElement(WrappedComponent, {
+							...this.mergedProps,
+							ref: 'wrappedInstance'
+						});
+				} else {
+					this.renderedElement = createElement(WrappedComponent, this.mergedProps);
+				}
+
+				return this.renderedElement;
+			}
+		}
+
+		StoreContainer.displayName = `StoreContainer(${getDisplayName(WrappedComponent)})`
+		StoreContainer.WrappedComponent = WrappedComponent
+
+		StoreContainer.contextTypes = {
+			store: PropTypes.object.isRequired,
+		}
+
+
+
+		if (process.env.NODE_ENV !== "production") {
+			StoreContainer.prototype.componentWillUpdate = function componentWillUpdate() {
+				if (this.version === version) {
+					return
+				}
+
+				// We are hot reloading!
+				this.version = version
+				this.trySubscribe()
+				this.clearCache()
+			}
+
+
+			return hoistStatics(StoreContainer, WrappedComponent)
+		}
+	}
+}
