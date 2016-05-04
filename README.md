@@ -4,9 +4,6 @@ f.lux React
 Official React bindings for [f.lux](https://github.com/akrumel/f.lux).
 
 
-f.lux is a Flux inspired data management library for javascript applications that introduces the concept of a shadow state.
-
-
 ### Installation
 
 f.lux React requires **React 0.14 or later.**
