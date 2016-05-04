@@ -6,7 +6,7 @@ import invariant from "invariant";
 import isPlainObject from "lodash.isplainobject";
 import { Component, createElement, PropTypes } from "react";
 
-import shallowEqual from "f.lux/utils/shallowEqual";
+import { shallowEqual } from "akutils";
 
 
 const defaultMergeProps = (stateProps, parentProps, containerProps) => ({
@@ -113,7 +113,7 @@ export default function storeContainer(mapShadowToProps, mergeProps, options = {
 
 			getWrappedInstance() {
 				invariant(
-						withRef, 
+						withRef,
 						`To access the wrapped instance, you need to specify  { withRef: true } as the fourth `+
 							`argument of the connect() call.`
 					);
@@ -188,7 +188,7 @@ export default function storeContainer(mapShadowToProps, mergeProps, options = {
 				this.haveOwnPropsChanged = false;
 				this.hasShadowChanged = false;
 
-				// 
+				//
 				var shouldUpdateShadowProps = true;
 
 				if (pure && renderedElement) {
