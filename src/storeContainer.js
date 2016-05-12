@@ -9,6 +9,8 @@ import { Component, createElement, PropTypes } from "react";
 import { shallowEqual } from "akutils";
 
 
+const defaultInitialStoreProps = (shadow) => true;
+
 const defaultMergeProps = (stateProps, parentProps, containerProps) => ({
 		...parentProps,
 		...stateProps,
@@ -23,8 +25,9 @@ function getDisplayName(WrappedComponent) {
 var nextVersion = 0;
 
 
-export default function storeContainer(mapShadowToProps, mergeProps, options = {}) {
+export default function storeContainer(mapShadowToProps, initialStoreProps, mergeProps, options = {}) {
 	const shouldSubscribe = Boolean(mapShadowToProps);
+	const finalInitialStoreProps = initialStoreProps || defaultInitialStoreProps;
 	const finalMergeProps = mergeProps || defaultMergeProps
 	const checkMergedEquals = finalMergeProps !== defaultMergeProps
 	const { pure = true, withRef = false } = options;
@@ -51,13 +54,17 @@ export default function storeContainer(mapShadowToProps, mergeProps, options = {
 
 				this.version = version;
 				this.store = props.store || context.store;
+				this.defaultStorePropsSet = false;
 
 				invariant(this.store, `Could not find f.lux Store in the context or props of ` +
 					`<${this.constructor.displayName}>. Either wrap the root component in a <Provider>, or explicitly ` +
 					`pass "store" as a prop to <${this.constructor.displayName}>.`
 				)
 
-				this.state = { shadow: this.store.shadow };
+				this.state = {
+					defaultStorePropsSet: finalInitialStoreProps(this.store.shadow),
+					shadow: this.store.shadow
+				};
 			}
 
 			componentDidMount() {
@@ -124,6 +131,12 @@ export default function storeContainer(mapShadowToProps, mergeProps, options = {
 			@autobind
 			handleChange() {
 				if (!this.subscribed) { return }
+
+				if (!this.state.defaultStorePropsSet) {
+					this.setState({
+						defaultStorePropsSet: finalInitialStoreProps(this.store.shadow)
+					})
+				}
 
 				const prevShadow = this.state.shadow;
 				const shadow = this.store.shadow;
@@ -214,6 +227,11 @@ export default function storeContainer(mapShadowToProps, mergeProps, options = {
 				if (!haveMergedPropsChanged && renderedElement) {
 
 					return renderedElement
+				}
+
+				if (!this.state.defaultStorePropsSet) {
+					console.log(`Waiting on default: ${this.constructor.displayName}`);
+					return options.renderWaiting ?options.renderWaiting(this.shadow) :null;
 				}
 
 				if (withRef) {
