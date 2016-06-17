@@ -85,7 +85,7 @@ export default function collectionContainer(collectionPropName, errorHandler, op
 					 if (this.endpointId !== collection.endpoint.id) {
 						this.clearError();
 					}
-						
+
 					this.endpointId = collection.endpoint.id;
 
 					if (this.collection.isConnected() && !this.syncCalled() && !this.state.error) {
@@ -99,13 +99,38 @@ export default function collectionContainer(collectionPropName, errorHandler, op
 				if (!this.state.error) { return }
 
 				this.setState(
-					{ error: null }, 
+					{ error: null },
 					() => {
 							if (resync && this.collection.isConnected()) {
 								this.sync();
 							}
 						}
 					);
+			}
+
+			getWrappedInstance() {
+				invariant(
+						withRef,
+						`To access the wrapped instance, you need to specify  { withRef: true } as the fourth `+
+							`argument of the collectionContainer() call.`
+					);
+
+				var wrapped = this.refs.wrappedInstance;
+
+				while(wrapped.refs.wrappedInstance) {
+					wrapped = wrapped.refs.wrappedInstance;
+				}
+
+				return wrapped;
+			}
+
+			mergeProps() {
+				return {
+					...this.props,
+					[`${collectionPropName}Error`]: this.state.error,
+					[`clear${capitalize(collectionPropName)}Error`]: this.clearError,
+					[`sync${capitalize(collectionPropName)}`]: this.sync,
+				}
 			}
 
 			syncCalled() {
@@ -116,19 +141,10 @@ export default function collectionContainer(collectionPropName, errorHandler, op
 					page && collection.paging || collection.nextOffset != 0);
 			}
 
-			mergeProps() {
-				return { 
-					...this.props, 
-					[`${collectionPropName}Error`]: this.state.error,
-					[`clear${capitalize(collectionPropName)}Error`]: this.clearError,
-					[`sync${capitalize(collectionPropName)}`]: this.sync,
-				}
-			}
-
 			@autobind
 			sync(mergeOp) {
-				if (this.syncCalled() || (this.collection && !this.collection.isConnected()) ) { 
-					return 
+				if (this.syncCalled() || (this.collection && !this.collection.isConnected()) ) {
+					return
 				}
 
 				invariant(this.collection, `Could not find "${collectionPropName}" in the props of ` +
@@ -139,7 +155,7 @@ export default function collectionContainer(collectionPropName, errorHandler, op
 				if (page) {
 					if (!this.collection.fetching && !this.collection.paging) {
 						this.collection.fetchNext(mergeOp)
-							.catch( error => this.setState({ error: error }) );					
+							.catch( error => this.setState({ error: error }) );
 					}
 				} else {
 					this.collection.fetch(null, mergeOp)
@@ -159,7 +175,7 @@ export default function collectionContainer(collectionPropName, errorHandler, op
 						return this.hourglass;
 					} else if (this.hourglass) {
 						// clear the hourglass
-						this.hourglass = null;				
+						this.hourglass = null;
 					}
 				}
 

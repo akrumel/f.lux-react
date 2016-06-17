@@ -122,10 +122,16 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 				invariant(
 						withRef,
 						`To access the wrapped instance, you need to specify  { withRef: true } as the fourth `+
-							`argument of the connect() call.`
+							`argument of the storeContainer() call.`
 					);
 
-				return this.refs.wrappedInstance;
+				var wrapped = this.refs.wrappedInstance;
+
+				while(wrapped.refs.wrappedInstance) {
+					wrapped = wrapped.refs.wrappedInstance;
+				}
+
+				return wrapped;
 			}
 
 			@autobind

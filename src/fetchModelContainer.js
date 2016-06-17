@@ -22,29 +22,29 @@ var nextVersion = 0;
 	The container function takes three parameters:
 		* modelName - model will be stored in a property variable named `modelName`. For modelName of "foo"
 				the model can be accessed using this.props.foo (required)
-		* collectionPropName - property name where the f.lux collection can be found on the properties. This 
+		* collectionPropName - property name where the f.lux collection can be found on the properties. This
 				container does not utilize the context. (required)
-		* options - current supports a single property of 'withRef' which if true specifies the 
+		* options - current supports a single property of 'withRef' which if true specifies the
 				ref="wrappedInstance" for the wrapped element.
 
-	The container sets up the following functions and values on the proeprties object based on the two parameters 
-	(assume parameters modelName='user' and fluxStoreName='userStore'):  
+	The container sets up the following functions and values on the proeprties object based on the two parameters
+	(assume parameters modelName='user' and fluxStoreName='userStore'):
 		1) this.props.clearUser() - unsets the model property variable, ie this.props.user will be set to null
 		2) this.props.clearUserError() - unsets the last error that occurred during the previous fetchUser()
 				request
 		3) this.props.fetchUserError - the error that occurred during the previous fetchUser() request.
-		4) this.props.fetchUser(modelId, force) - the function to trigger a fetch of model with id=modelId. The 
+		4) this.props.fetchUser(modelId, force) - the function to trigger a fetch of model with id=modelId. The
 				force flag will cause the fetch to take place even if one is currently in progress.
 		5) this.props.fetchUserCalled() - gets if a previous call to fetchUser() has been made. Useful for
 				componentDidUpdate() guards to prevent unnecessary fetch calls.
 		6) this.props.isFetchingUser() - returns true if fetching is in progress
-		7) this.prpos.user` - the fetched model. 
-		8) this.prpos.userId` - the ID of the model [being] fetched. 
+		7) this.prpos.user` - the fetched model.
+		8) this.prpos.userId` - the ID of the model [being] fetched.
 
 	Lifecycle (assume modelName='user':
 		Not fetched: this.props.user is null/undefined and this.props.isFetchingUser() returns false
-		Fetching: this.props.isFetchingUser() returns true 
-		Fetched: this.props.user contains the model instance and this.isFetchingUser() returns false 
+		Fetching: this.props.isFetchingUser() returns true
+		Fetched: this.props.user contains the model instance and this.isFetchingUser() returns false
 */
 export default function fetchModelContainer(modelName, collectionPropName, options={}) {
 	const { withRef = false } = options;
@@ -99,7 +99,7 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 						this.clearModel();
 					}
-						
+
 					this.endpointId = collection.endpoint.id;
 
 					if (this.modelId) {
@@ -125,7 +125,7 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 				this.modelId = null;
 				this.startFetchTime = null;
 
-				this.setState({ 
+				this.setState({
 						isFetching: false,
 					});
 			}
@@ -157,7 +157,7 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 				this.collection.find(modelId)
 					.then( model => {
-							if (this.startFetchTime != time) { 
+							if (this.startFetchTime != time) {
 								console.info(
 									`fetchModelContainer::fetchModel() - fetch for ${modelName}:${modelId} @${time} ` +
 									`superceded by @${this.startFetchTime} - force=${force}`
@@ -168,8 +168,8 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 							this.startFetchTime = null;
 							this.model = model;
-							this.setState({ 
-									isFetching: false, 
+							this.setState({
+									isFetching: false,
 								});
 						})
 					.catch( error => {
@@ -197,14 +197,30 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 			}
 
+			getWrappedInstance() {
+				invariant(
+						withRef,
+						`To access the wrapped instance, you need to specify  { withRef: true } as the fourth `+
+							`argument of the fetchModelContainer() call.`
+					);
+
+				var wrapped = this.refs.wrappedInstance;
+
+				while(wrapped.refs.wrappedInstance) {
+					wrapped = wrapped.refs.wrappedInstance;
+				}
+
+				return wrapped;
+			}
+
 			@autobind
 			isFetching() {
 				return this.state.isFetching;
 			}
 
 			mergeProps() {
-				return { 
-					...this.props, 
+				return {
+					...this.props,
 					[`clear${capitalize(modelName)}Error`]: this.clearError,
 					[`clear${capitalize(modelName)}`]: this.clearModel,
 					[`fetch${capitalize(modelName)}`]: this.fetchModel,
