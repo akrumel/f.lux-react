@@ -60,6 +60,7 @@ export default function collectionContainer(collectionPropName, errorHandler, op
 			}
 
 			componentWillMount() {
+				this.state.mounted = true;
 				this.checkForCollectionChange(this.props);
 
 				if (this.collection && !this.syncCalled() && this.collection.isConnected()) {
@@ -69,6 +70,10 @@ export default function collectionContainer(collectionPropName, errorHandler, op
 
 			componentWillReceiveProps(nextProps) {
 				this.checkForCollectionChange(nextProps);
+			}
+
+			componentWillUnmount() {
+				this.state.mounted = false;
 			}
 
 			checkForCollectionChange(props) {
@@ -108,10 +113,21 @@ export default function collectionContainer(collectionPropName, errorHandler, op
 					);
 			}
 
+			@autobind
+			fetchError(error) {
+				if (errorHandler) {
+					errorHandler(error.message, error);
+				}
+
+				if (this.state.mounted) {
+					this.setState({ error: error });
+				}
+			}
+
 			getWrappedInstance() {
 				invariant(
 						withRef,
-						`To access the wrapped instance, you need to specify  { withRef: true } as the fourth `+
+						`To access the wrapped instance, you need to specify { withRef: true } as the fourth `+
 							`argument of the collectionContainer() call.`
 					);
 
@@ -155,11 +171,11 @@ export default function collectionContainer(collectionPropName, errorHandler, op
 				if (page) {
 					if (!this.collection.fetching && !this.collection.paging) {
 						this.collection.fetchNext(mergeOp)
-							.catch( error => this.setState({ error: error }) );
+							.catch(this.fetchError);
 					}
 				} else {
 					this.collection.fetch(null, mergeOp)
-						.catch( error => this.setState({ error: error }) );
+						.catch(this.fetchError);
 				}
 			}
 
