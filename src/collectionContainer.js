@@ -3,18 +3,11 @@ import { Component, createElement, PropTypes } from "react";
 import hoistStatics from "hoist-non-react-statics";
 import invariant from "invariant";
 
+import { Store } from "f.lux";
 
 // http://stackoverflow.com/questions/1026069/capitalize-the-first-letter-of-string-in-javascript
 function capitalize(s) {
 	return s && s[0].toUpperCase() + s.slice(1);
-}
-
-function defaultErrorHandler(msg, error) {
-	console.warn(msg);
-
-	if (error.stack) {
-		console.warn(error.stack);
-	}
 }
 
 function getDisplayName(WrappedComponent) {
@@ -25,21 +18,13 @@ function getDisplayName(WrappedComponent) {
 var nextVersion = 0;
 
 
-export default function collectionContainer(collectionPropName, errorHandler, options={}) {
+export default function collectionContainer(collectionPropName, options={}) {
 	const { page=false, withRef=false } = options;
 
 	// Helps track hot reloading.
 	const version = nextVersion++;
-	const finalErrorHandler = errorHandler || defaultErrorHandler;
 
 	return function wrapWithContainer(WrappedComponent, HourglassComponent) {
-		function onSyncError(error) {
-			const msg = `Unable to sync collection "${collectionPropName}" for component ` +
-				`${getDisplayName(WrappedComponent)} due to error: ${error}`;
-
-			finalErrorHandler(msg, error);
-		}
-
 		class CollectionContainer extends Component {
 			constructor(props, context) {
 				super(props, context);
@@ -115,9 +100,8 @@ export default function collectionContainer(collectionPropName, errorHandler, op
 
 			@autobind
 			fetchError(error) {
-				if (errorHandler) {
-					errorHandler(error.message, error);
-				}
+				const msg = `Unable to sync collection "${collectionPropName}" for component ` +
+					`${getDisplayName(WrappedComponent)} due to error: ${error}`;
 
 				if (this.state.mounted) {
 					this.setState({ error: error });
@@ -149,12 +133,16 @@ export default function collectionContainer(collectionPropName, errorHandler, op
 				}
 			}
 
-			syncCalled() {
-				const collection = this.collection;
+			@autobind
+			restoreOnError(error) {
+				const backup = this.collection.$$.getOfflineState();
 
-				return collection && (
-					(collection.fetching || collection.synced) ||
-					page && collection.paging || collection.nextOffset != 0);
+				if (!backup) {
+					return Store.reject(error);
+				}
+
+				return backup.restore()
+					.catch( restoreError => Store.reject(error) );
 			}
 
 			@autobind
@@ -168,15 +156,27 @@ export default function collectionContainer(collectionPropName, errorHandler, op
 					`explicitly pass "${collectionPropName}" as a prop to <${this.constructor.displayName}>.`
 				)
 
+				this.setState({ error: null });
+
 				if (page) {
 					if (!this.collection.fetching && !this.collection.paging) {
 						this.collection.fetchNext(mergeOp)
+							.catch(this.restoreOnError)
 							.catch(this.fetchError);
 					}
 				} else {
 					this.collection.fetch(null, mergeOp)
+						.catch(this.restoreOnError)
 						.catch(this.fetchError);
 				}
+			}
+
+			syncCalled() {
+				const collection = this.collection;
+
+				return collection && (
+					(collection.fetching || collection.synced) ||
+					(page && (collection.paging || collection.nextOffset != 0)) );
 			}
 
 			render() {
