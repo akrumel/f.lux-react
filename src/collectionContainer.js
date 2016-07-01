@@ -183,7 +183,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 				const mergedProps = this.mergeProps();
 
 				if (HourglassComponent) {
-					if (this.collection && (this.collection.fetching || this.collection.paging)) {
+					if (this.collection && this.collection.size===0 && (this.collection.fetching || this.collection.paging)) {
 						if (!this.hourglass) {
 							this.hourglass = createElement(HourglassComponent, mergedProps);
 						}
