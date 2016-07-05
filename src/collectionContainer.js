@@ -63,6 +63,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 
 			checkForCollectionChange(props) {
 				const collection = props[collectionPropName];
+				const prevCollection = this.collection;
 
 				if (collection === this.collection) { return }
 
@@ -80,6 +81,8 @@ export default function collectionContainer(collectionPropName, options={}) {
 
 					if (this.collection.isConnected() && !this.syncCalled() && !this.state.error) {
 						this.sync();
+					} else if (this.state.error && collection.synced || collection.nextOffset !== prevCollection.nextOffset) {
+						this.setState({ error: null });
 					}
 				}
 			}
@@ -173,17 +176,29 @@ export default function collectionContainer(collectionPropName, options={}) {
 
 			syncCalled() {
 				const collection = this.collection;
+				const backup = collection && this.collection.$$.getOfflineState();
 
 				return collection && (
 					(collection.fetching || collection.synced) ||
-					(page && (collection.paging || collection.nextOffset != 0)) );
+					(page && (collection.paging || collection.nextOffset != 0)) ||
+					(backup && backup.inProgress) );
+			}
+
+			backupInProgress() {
+				const collection = this.collection;
+				const backup = collection && this.collection.$$.getOfflineState();
+
+				return backup && backup.inProgress;
 			}
 
 			render() {
 				const mergedProps = this.mergeProps();
+				const collection = this.collection;
 
 				if (HourglassComponent) {
-					if (this.collection && this.collection.size===0 && (this.collection.fetching || this.collection.paging)) {
+					if (collection && collection.size===0 && collection.isConnected() &&
+						(this.backupInProgress() || collection.fetching || collection.paging))
+					{
 						if (!this.hourglass) {
 							this.hourglass = createElement(HourglassComponent, mergedProps);
 						}
