@@ -74,8 +74,13 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 			}
 
 			componentWillMount() {
+				this.mounted = true;
 				this.checkForCollectionChange(this.props);
 				this.clearCache();
+			}
+
+			componentWillUnmount() {
+				this.mounted = false;
 			}
 
 			componentWillReceiveProps(nextProps) {
@@ -116,7 +121,9 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 			@autobind
 			clearError() {
-				this.setState({ error: null });
+				if (this.mounted) {
+					this.setState({ error: null });
+				}
 			}
 
 			@autobind
@@ -125,9 +132,11 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 				this.modelId = null;
 				this.startFetchTime = null;
 
-				this.setState({
-						isFetching: false,
-					});
+				if (this.mounted) {
+					this.setState({
+							isFetching: false,
+						});
+				}
 			}
 
 			@autobind
@@ -150,10 +159,12 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 				this.modelId = modelId;
 				this.startFetchTime = time;
 
-				this.setState({
-						isFetching: true,
-						error: null,
-					});
+				if (this.mounted) {
+					this.setState({
+							isFetching: true,
+							error: null,
+						});
+				}
 
 				this.collection.find(modelId)
 					.then( model => {
@@ -168,18 +179,23 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 							this.startFetchTime = null;
 							this.model = model;
-							this.setState({
-									isFetching: false,
-								});
+
+							if (this.mounted) {
+								this.setState({
+										isFetching: false,
+									});
+							}
 						})
 					.catch( error => {
 						// only report errors for most recent request
 						if (this.startFetchTime == time) {
 							// unset the current user and progress state flag
-							this.setState({
-									isFetching: false,
-									error: error
-								});
+							if (this.mounted) {
+								this.setState({
+										isFetching: false,
+										error: error
+									});
+							}
 
 							// remove the timestamp
 							this.startFetchTime = null;

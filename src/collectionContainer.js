@@ -1,7 +1,7 @@
 import autobind from "autobind-decorator";
-import { Component, createElement, PropTypes } from "react";
 import hoistStatics from "hoist-non-react-statics";
 import invariant from "invariant";
+import { Component, createElement, PropTypes } from "react";
 
 import { Store } from "f.lux";
 
