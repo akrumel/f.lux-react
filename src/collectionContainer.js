@@ -19,7 +19,7 @@ var nextVersion = 0;
 
 
 export default function collectionContainer(collectionPropName, options={}) {
-	const { page=false, withRef=false } = options;
+	const { page=false, resync=false, withRef=false } = options;
 
 	// Helps track hot reloading.
 	const version = nextVersion++;
@@ -48,8 +48,12 @@ export default function collectionContainer(collectionPropName, options={}) {
 				this.state.mounted = true;
 				this.checkForCollectionChange(this.props);
 
-				if (this.collection && !this.syncCalled() && this.collection.isConnected()) {
-					this.sync();
+				if (this.collection && this.collection.isConnected()) {
+					if (!this.syncCalled()) {
+						this.sync();
+					} else if (resync) {
+						this.resync();
+					}
 				}
 			}
 
@@ -146,6 +150,17 @@ export default function collectionContainer(collectionPropName, options={}) {
 
 				return backup.restore()
 					.catch( restoreError => Store.reject(error) );
+			}
+
+			resync() {
+				invariant(this.collection, `Could not find "${collectionPropName}" in the props of ` +
+					`<${this.constructor.displayName}>. Either wrap the root component in a storeContainer(), or ` +
+					`explicitly pass "${collectionPropName}" as a prop to <${this.constructor.displayName}>.`
+				)
+
+				return this.collection.resync()
+					.catch(this.restoreOnError)
+					.catch(this.fetchError);
 			}
 
 			@autobind
