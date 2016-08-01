@@ -148,7 +148,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 					return Store.reject(error);
 				}
 
-				return backup.restore()
+				return backup.restore(error)
 					.catch( restoreError => Store.reject(error) );
 			}
 
