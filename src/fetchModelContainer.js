@@ -67,6 +67,8 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 				this.modelId = null;
 				this.startFetchTime = null;
 
+				this.displayName = getDisplayName(WrappedComponent);
+
 				this.state = {
 					isFetching: false,
 					error: null,

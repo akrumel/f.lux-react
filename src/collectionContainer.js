@@ -39,6 +39,8 @@ export default function collectionContainer(collectionPropName, options={}) {
 				this.modelId = null;
 				this.startFetchTime = null;
 
+				this.displayName = getDisplayName(WrappedComponent);
+
 				this.state = {
 					error: null,
 				};

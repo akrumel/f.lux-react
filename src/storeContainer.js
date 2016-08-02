@@ -61,6 +61,8 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 					`pass "store" as a prop to <${this.constructor.displayName}>.`
 				)
 
+				this.displayName = getDisplayName(WrappedComponent);
+
 				this.state = {
 					defaultStorePropsSet: finalInitialStoreProps(this.store.shadow),
 					shadow: this.store.shadow
