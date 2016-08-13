@@ -18,7 +18,9 @@ const defaultMergeProps = (stateProps, parentProps, containerProps) => ({
 	});
 
 function getDisplayName(WrappedComponent) {
-	return WrappedComponent.displayName || WrappedComponent.name || 'Component'
+	return (WrappedComponent && WrappedComponent.displayName) ||
+			(WrappedComponent && WrappedComponent.name) ||
+			'Component';
 }
 
 // Helps track hot reloading.
@@ -238,7 +240,6 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 				}
 
 				if (!this.state.defaultStorePropsSet) {
-					console.log(`Waiting on default: ${this.constructor.displayName}`);
 					return options.renderWaiting ?options.renderWaiting(this.shadow) :null;
 				}
 
@@ -263,7 +264,6 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 		}
 
 
-
 		if (process.env.NODE_ENV !== "production") {
 			StoreContainer.prototype.componentWillUpdate = function componentWillUpdate() {
 				if (this.version === version) {
@@ -278,6 +278,8 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 
 
 			return hoistStatics(StoreContainer, WrappedComponent)
+		} else {
+			return StoreContainer;
 		}
 	}
 }

@@ -11,7 +11,9 @@ function capitalize(s) {
 }
 
 function getDisplayName(WrappedComponent) {
-	return WrappedComponent.displayName || WrappedComponent.name || 'Component'
+	return (WrappedComponent && WrappedComponent.displayName) ||
+			(WrappedComponent && WrappedComponent.name) ||
+			'Component';
 }
 
 // Helps track hot reloading.
@@ -259,6 +261,8 @@ export default function collectionContainer(collectionPropName, options={}) {
 
 
 			return hoistStatics(CollectionContainer, WrappedComponent)
+		} else {
+			return CollectionContainer;
 		}
 	}
 }

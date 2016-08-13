@@ -11,7 +11,9 @@ function capitalize(s) {
 
 
 function getDisplayName(WrappedComponent) {
-	return WrappedComponent.displayName || WrappedComponent.name || 'Component'
+	return (WrappedComponent && WrappedComponent.displayName) ||
+			(WrappedComponent && WrappedComponent.name) ||
+			'Component';
 }
 
 // Helps track hot reloading.
@@ -286,6 +288,8 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 
 			return hoistStatics(FetchModelContainer, WrappedComponent)
+		} else {
+			return FetchModelContainer;
 		}
 	}
 }
