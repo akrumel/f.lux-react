@@ -71,6 +71,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 
 			checkForCollectionChange(props) {
 				const collection = props[collectionPropName];
+				const endpointId = collection && collection.endpoint && collection.endpoint.id;
 				const prevCollection = this.collection;
 
 				if (collection === this.collection) { return }
@@ -81,11 +82,11 @@ export default function collectionContainer(collectionPropName, options={}) {
 					this.endpointId = null;
 					this.clearError();
 				} else {
-					 if (this.endpointId !== collection.endpoint.id) {
+					 if (this.endpointId !== endpointId) {
 						this.clearError();
 					}
 
-					this.endpointId = collection.endpoint.id;
+					this.endpointId = endpointId;
 
 					if (this.collection.isConnected() && !this.syncCalled() && !this.state.error) {
 						this.sync();
