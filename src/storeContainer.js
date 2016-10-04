@@ -106,20 +106,20 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 
 				const shadow = store.shadow;
 				const shadowProps = this.doShadowPropsDependOnOwnProps ?
-					this.finalMapShadowToProps(shadow, props) :
+					this.finalMapShadowToProps(shadow, props, store) :
 					this.finalMapShadowToProps(shadow);
 
 				return shadowProps;
 			}
 
 			configureFinalMapShadow(store, props) {
-				const mappedShadow = mapShadowToProps(store.shadow, props);
+				const mappedShadow = mapShadowToProps(store.shadow, props, store);
 				const isFactory = typeof mappedShadow === 'function'
 
 				this.finalMapShadowToProps = isFactory ?mappedShadow :mapShadowToProps;
 				this.doShadowPropsDependOnOwnProps = this.finalMapShadowToProps.length !== 1;
 
-				return isFactory ?this.computeShadowProps(store.shadow, props) :mappedShadow;
+				return isFactory ?this.computeShadowProps(store.shadow, props, store) :mappedShadow;
 			}
 
 			getWrappedInstance() {
