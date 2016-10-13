@@ -147,7 +147,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 
 			@autobind
 			restoreOnError(error) {
-				const backup = this.collection.$$.getOfflineState();
+				const backup = this.collection.$$().getOfflineState();
 
 				if (!backup) {
 					return Store.reject(error);
@@ -196,7 +196,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 
 			syncCalled() {
 				const collection = this.collection;
-				const backup = collection && this.collection.$$.getOfflineState();
+				const backup = collection && this.collection.$$().getOfflineState();
 
 				return collection && (
 					(collection.fetching || collection.synced) ||
@@ -206,7 +206,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 
 			backupInProgress() {
 				const collection = this.collection;
-				const backup = collection && this.collection.$$.getOfflineState();
+				const backup = collection && this.collection.$$().getOfflineState();
 
 				return backup && backup.inProgress;
 			}
