@@ -92,7 +92,7 @@ export default class FluxInput extends Component {
 		const { format, onChange, type } = this.props;
 		const modelValue = this._modelValue();
 		const { checked, value } = event.target;
-		const nextModelValue = this.isCheckedType() ?!checked :value;
+		const nextModelValue = this.isCheckedType() ?checked :value;
 
 		this.setState(
 			{
