@@ -1,0 +1,130 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/node-v6.1.0-darwin-x64/bin/node',
+1 verbose cli   '/Library/Node/bin/npm',
+1 verbose cli   'publish' ]
+2 info using npm@3.10.8
+3 info using node@v6.1.0
+4 verbose publish [ '.' ]
+5 silly cache add args [ '.', null ]
+6 verbose cache add spec .
+7 silly cache add parsed spec Result {
+7 silly cache add   raw: '.',
+7 silly cache add   scope: null,
+7 silly cache add   escapedName: null,
+7 silly cache add   name: null,
+7 silly cache add   rawSpec: '.',
+7 silly cache add   spec: '/Users/andy/dev/f.lux-react',
+7 silly cache add   type: 'directory' }
+8 verbose addLocalDirectory /Users/andy/.npm/f.lux-react/0.9.11/package.tgz not in flight; packing
+9 verbose correctMkdir /Users/andy/.npm correctMkdir not in flight; initializing
+10 info lifecycle f.lux-react@0.9.11~prepublish: f.lux-react@0.9.11
+11 silly lifecycle f.lux-react@0.9.11~prepublish: no script for prepublish, continuing
+12 verbose tar pack [ '/Users/andy/.npm/f.lux-react/0.9.11/package.tgz',
+12 verbose tar pack   '/Users/andy/dev/f.lux-react' ]
+13 verbose tarball /Users/andy/.npm/f.lux-react/0.9.11/package.tgz
+14 verbose folder /Users/andy/dev/f.lux-react
+15 verbose addLocalTarball adding from inside cache /Users/andy/.npm/f.lux-react/0.9.11/package.tgz
+16 verbose correctMkdir /Users/andy/.npm correctMkdir not in flight; initializing
+17 silly cache afterAdd f.lux-react@0.9.11
+18 verbose afterAdd /Users/andy/.npm/f.lux-react/0.9.11/package/package.json not in flight; writing
+19 verbose correctMkdir /Users/andy/.npm correctMkdir not in flight; initializing
+20 verbose afterAdd /Users/andy/.npm/f.lux-react/0.9.11/package/package.json written
+21 silly publish { name: 'f.lux-react',
+21 silly publish   version: '0.9.11',
+21 silly publish   description: 'Official React bindings for f.lux',
+21 silly publish   author: { name: 'Andy Krumel' },
+21 silly publish   license: 'MIT',
+21 silly publish   repository:
+21 silly publish    { type: 'git',
+21 silly publish      url: 'git+https://github.com/akrumel/f.lux-react.git' },
+21 silly publish   main: 'lib/index.js',
+21 silly publish   dependencies:
+21 silly publish    { akutils: '^1.0.0',
+21 silly publish      'autobind-decorator': '^1.3.3',
+21 silly publish      'hoist-non-react-statics': '^1.0.5',
+21 silly publish      invariant: '^2.2.1',
+21 silly publish      'lodash.isplainobject': '^4.0.4' },
+21 silly publish   devDependencies:
+21 silly publish    { 'babel-cli': '^6.7.7',
+21 silly publish      'babel-core': '^6.7.2',
+21 silly publish      'babel-loader': '^6.2.4',
+21 silly publish      'babel-plugin-transform-decorators-legacy': '^1.3.4',
+21 silly publish      'babel-plugin-transform-es2015-modules-commonjs': '^6.7.7',
+21 silly publish      'babel-plugin-transform-es2015-spread': '^6.6.5',
+21 silly publish      'babel-plugin-transform-object-rest-spread': '^6.6.5',
+21 silly publish      'babel-preset-es2015': '^6.6.0',
+21 silly publish      'babel-preset-react': '^6.16.0',
+21 silly publish      'cross-env': '^1.0.7',
+21 silly publish      rimraf: '^2.5.2' },
+21 silly publish   peerDependencies: { 'f.lux': '^0.9.0', react: '^0.14.0 || ^15.0.0-0' },
+21 silly publish   scripts:
+21 silly publish    { clean: 'rimraf lib dist es coverage',
+21 silly publish      'build:commonjs': 'cross-env BABEL_ENV=commonjs babel src --out-dir lib',
+21 silly publish      build: 'npm run build:commonjs' },
+21 silly publish   readme: 'f.lux React\n=========================\n\nOfficial React bindings for [f.lux](https://github.com/akrumel/f.lux).\n\n\n### Installation\n\nf.lux React requires **React 0.14 or later.**\n\nTo install the stable version:\n\n```\nnpm install --save f.lux-react\n```\n\nThis assumes you are using [npm](https://www.npmjs.com/) as your package manager.\n\n\n### Coming Soon\n\nDocumentation, examples, and test cases.\n',
+21 silly publish   readmeFilename: 'README.md',
+21 silly publish   gitHead: 'cb28001df3a0dbefe8dedf9cfb192053de1402b9',
+21 silly publish   bugs: { url: 'https://github.com/akrumel/f.lux-react/issues' },
+21 silly publish   homepage: 'https://github.com/akrumel/f.lux-react#readme',
+21 silly publish   _id: 'f.lux-react@0.9.11',
+21 silly publish   _shasum: '32d523f286d97b15295aba14925b638f5d64e678',
+21 silly publish   _from: '.' }
+22 verbose getPublishConfig undefined
+23 silly mapToRegistry name f.lux-react
+24 silly mapToRegistry using default registry
+25 silly mapToRegistry registry https://registry.npmjs.org/
+26 silly mapToRegistry data Result {
+26 silly mapToRegistry   raw: 'f.lux-react',
+26 silly mapToRegistry   scope: null,
+26 silly mapToRegistry   escapedName: 'f.lux-react',
+26 silly mapToRegistry   name: 'f.lux-react',
+26 silly mapToRegistry   rawSpec: '',
+26 silly mapToRegistry   spec: 'latest',
+26 silly mapToRegistry   type: 'tag' }
+27 silly mapToRegistry uri https://registry.npmjs.org/f.lux-react
+28 verbose publish registryBase https://registry.npmjs.org/
+29 silly publish uploading /Users/andy/.npm/f.lux-react/0.9.11/package.tgz
+30 verbose request uri https://registry.npmjs.org/f.lux-react
+31 verbose request sending authorization for write operation
+32 info attempt registry request try #1 at 12:39:22 PM
+33 verbose request using bearer token for auth
+34 verbose request id 8ab769d0c293d840
+35 http request PUT https://registry.npmjs.org/f.lux-react
+36 http 403 https://registry.npmjs.org/f.lux-react
+37 verbose headers { 'content-type': 'application/json',
+37 verbose headers   'cache-control': 'max-age=300',
+37 verbose headers   'content-length': '96',
+37 verbose headers   'accept-ranges': 'bytes',
+37 verbose headers   date: 'Fri, 14 Oct 2016 18:39:24 GMT',
+37 verbose headers   via: '1.1 varnish',
+37 verbose headers   connection: 'keep-alive',
+37 verbose headers   'x-served-by': 'cache-den6021-DEN',
+37 verbose headers   'x-cache': 'MISS',
+37 verbose headers   'x-cache-hits': '0',
+37 verbose headers   'x-timer': 'S1476470363.449283,VS0,VE888',
+37 verbose headers   vary: 'Accept-Encoding' }
+38 verbose request invalidating /Users/andy/.npm/registry.npmjs.org/f.lux-react on PUT
+39 error publish Failed PUT 403
+40 verbose stack Error: "You cannot publish over the previously published version 0.9.11." : f.lux-react
+40 verbose stack     at makeError (/usr/local/node-v6.1.0-darwin-x64/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:302:12)
+40 verbose stack     at CachingRegistryClient.<anonymous> (/usr/local/node-v6.1.0-darwin-x64/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:290:14)
+40 verbose stack     at Request._callback (/usr/local/node-v6.1.0-darwin-x64/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:210:14)
+40 verbose stack     at Request.self.callback (/usr/local/node-v6.1.0-darwin-x64/lib/node_modules/npm/node_modules/request/request.js:187:22)
+40 verbose stack     at emitTwo (events.js:106:13)
+40 verbose stack     at Request.emit (events.js:191:7)
+40 verbose stack     at Request.<anonymous> (/usr/local/node-v6.1.0-darwin-x64/lib/node_modules/npm/node_modules/request/request.js:1044:10)
+40 verbose stack     at emitOne (events.js:96:13)
+40 verbose stack     at Request.emit (events.js:188:7)
+40 verbose stack     at IncomingMessage.<anonymous> (/usr/local/node-v6.1.0-darwin-x64/lib/node_modules/npm/node_modules/request/request.js:965:12)
+41 verbose statusCode 403
+42 verbose pkgid f.lux-react
+43 verbose cwd /Users/andy/dev/f.lux-react
+44 error Darwin 15.2.0
+45 error argv "/usr/local/node-v6.1.0-darwin-x64/bin/node" "/Library/Node/bin/npm" "publish"
+46 error node v6.1.0
+47 error npm  v3.10.8
+48 error code E403
+49 error "You cannot publish over the previously published version 0.9.11." : f.lux-react
+50 error If you need help, you may report this error at:
+50 error     <https://github.com/npm/npm/issues>
+51 verbose exit [ 1, true ]
