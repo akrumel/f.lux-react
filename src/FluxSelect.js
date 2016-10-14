@@ -11,6 +11,7 @@ const propNamesBlacklist = [
 	'children',
 	'disabled',
 	'format',
+	'integer',
 	'model',
 	'onChange',
 	'onUpdate',

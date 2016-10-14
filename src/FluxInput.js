@@ -58,6 +58,12 @@ export default class FluxInput extends Component {
 		})
 	}
 
+	isCheckedType() {
+		const { type } = this.props;
+
+		return type === 'checkbox' || type === 'radio';
+	}
+
 	get value() {
 		return this.state.value;
 	}
@@ -83,13 +89,14 @@ export default class FluxInput extends Component {
 	}
 
 	_handleChange(event) {
-		const { format, onChange } = this.props;
+		const { format, onChange, type } = this.props;
 		const modelValue = this._modelValue();
-		var { value } = event.target;
+		const { checked, value } = event.target;
+		const nextModelValue = this.isCheckedType() ?!checked :value;
 
 		this.setState(
 			{
-				value: format(value),
+				value: format(nextModelValue),
 			},
 			() => {
 				// really need to generate a new event using this as target
@@ -170,9 +177,13 @@ export default class FluxInput extends Component {
 	}
 
 	render() {
-		const { disabled, model } = this.props;
+		const { disabled, model, type } = this.props;
 		const { value } = this.state;
 		const inputProps = omit(this.props, propNamesBlacklist);
+
+		if (this.isCheckedType()) {
+			inputProps.checked = value;
+		}
 
 		return <input { ...inputProps }
 				ref="input"
