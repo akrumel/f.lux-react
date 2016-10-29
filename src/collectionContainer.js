@@ -90,7 +90,9 @@ export default function collectionContainer(collectionPropName, options={}) {
 
 					if (this.collection.isConnected() && !this.syncCalled() && !this.state.error) {
 						this.sync();
-					} else if (this.state.error && collection.synced || collection.nextOffset !== prevCollection.nextOffset) {
+					} else if (this.state.error && (collection.synced ||
+							(prevCollection && collection.nextOffset !== prevCollection.nextOffset)))
+					{
 						this.setState({ error: null });
 					}
 				}

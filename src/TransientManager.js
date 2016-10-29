@@ -1,6 +1,8 @@
 
+function noop() {}
+
 export default class TransientManager {
-	constructor(name, onTransChange) {
+	constructor(name, onTransChange=noop) {
 		this.name = name;
 		this.onTransChange = onTransChange;
 	}
@@ -18,6 +20,12 @@ export default class TransientManager {
 
 			this.onTransChange(this.transId, trans);
 		}
+	}
+
+	object() {
+		const transObj = this.trans && this.trans.isActive() && this.trans._();
+
+		return transObj && transObj.data;
 	}
 
 	release() {
