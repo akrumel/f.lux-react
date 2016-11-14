@@ -146,7 +146,7 @@ export default class FluxInput extends Component {
 							try {
 								callback(currModel);
 							} catch(cbError) {
-								console.warn(`FluxInput Update Callback Error: name=${bind}, path=${model.$().dotPath()}`, error);
+								console.warn(`FluxInput Update Callback Error: name=${bind}, path=${model.$().dotPath()}`, cbError);
 							}
 						}
 
@@ -154,7 +154,7 @@ export default class FluxInput extends Component {
 							try {
 								onUpdate(currModel, bind);
 							} catch(cbError) {
-								console.warn(`FluxInput onUpdate() Error: name=${bind}, path=${model.$().dotPath()}`, error);
+								console.warn(`FluxInput onUpdate() Error: name=${bind}, path=${model.$().dotPath()}`, cbError);
 							}
 						}
 					});
