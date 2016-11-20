@@ -24,6 +24,7 @@ const propNamesBlacklist = [
 	'model',
 	'onBlur',
 	'onChange',
+	'onChangeTx',
 	'onUpdate',
 	'parse',
 	'ref',
@@ -63,7 +64,7 @@ function defaultChangeTx(callback) {
 			validation error is present on the context.
 		format - translation function called when the model[bind] value changes to convert the model
 			value to a format suitable for viewing. Useful for converting values for localization
-			purposes, such as dates, numbers, currencies. The method signature is:
+			purposes, such as dates, numbers, currencies. The function signature is:
 
 				function format(value) { return value }
 
@@ -80,6 +81,21 @@ function defaultChangeTx(callback) {
 			set when the 'checkedType' property is set to true. The default is false.
 		flushOnEnter - boolean flag specifying if model[bind] value should be set when the return
 			key is pressed. Default is true.
+		onChangeTx - onChange() event handler for converting non-React standard onChange() callback
+			to standard React format, ie callback(event). The event object should at a minimum support
+			the value and checked properties (as appropriate) and the persist() method. The function
+			signature is:
+
+				function changeTx(callback) {
+					return function(dataFromComponent) {
+						callback(new MyCustomEvevnt(dataFromComponent))
+					}
+				}
+
+			Thus, translation function takes a callback from the FluxWrapper and returns a function
+			that will be passed to the wrapped compnent's 'onChange' property. The 'onChange' handler
+			then converts the onChange event data to a React-like event and invokes the callback.
+			(Optional)
 
 	Disabled behavior
 		The disabled property may be set on this component. The wrapped component will receive a
