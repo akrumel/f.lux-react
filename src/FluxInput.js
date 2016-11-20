@@ -83,14 +83,12 @@ export default class FluxInput extends Component {
 		this.setState({
 				hasFocus: false,
 				focusValue: null,    //autosave will have already occurred so can clear
-			});
-
-		onBlur && onBlur(event)
+			},
+			() => onBlur && onBlur(event) );
 	}
 
 	_handleChange(event) {
 		const { format, onChange, type } = this.props;
-		const modelValue = this._modelValue();
 		const { checked, value } = event.target;
 		const nextModelValue = this.isCheckedType() ?checked :value;
 
@@ -125,10 +123,16 @@ export default class FluxInput extends Component {
 		onKeyPress && onKeyPress(event);
 	}
 
+	_modelValue(props=this.props) {
+		const { model, bind } = props;
+
+		return result(model, bind);
+	}
+
 	_shouldFlushOnChange() {
 		const { flushOnChange, type } = this.props;
 
-		return flushOnChange || (flushOnChange !== false && flushOnChangeTypeRe.test(type));
+		return flushOnChange || (flushOnChange == false && flushOnChangeTypeRe.test(type));
 	}
 
 	_updateValue(callback) {
@@ -170,12 +174,6 @@ export default class FluxInput extends Component {
 		}
 	}
 
-	_modelValue(props=this.props) {
-		const { model, bind } = props;
-
-		return result(model, bind);
-	}
-
 	render() {
 		const { disabled, model, type } = this.props;
 		const { value } = this.state;
@@ -208,6 +206,7 @@ FluxInput.propTypes = {
 			  PropTypes.string,
 			  PropTypes.number
 		  ]).isRequired,
+	flushOnChange: PropTypes.bool,
 	flushOnEnter: PropTypes.bool,
 	format: PropTypes.func,
 	model: PropTypes.object.isRequired,

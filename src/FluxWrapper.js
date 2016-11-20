@@ -9,10 +9,12 @@ import identity from "./identity";
 const propNamesBlacklist = [
 	'bind',
 	'children',
-	'disabled',
 	'format',
 	'model',
+	'onBlurTx',
 	'onChange',
+	'onChangeTx',
+	'onKeyPressTx',
 	'onUpdate',
 	'parse',
 	'ref',
@@ -38,11 +40,10 @@ export default class FluxWrapper extends Component {
 	}
 
 	_handleChange(value) {
-		const { bind, format, model, onChange, onError, onUpdate, parse } = this.props;
+		const { bind, model, onChange, onError, onUpdate, parse } = this.props;
 		const { target, key } = baseModel(model, bind);
 
 		try {
-			const modelValue = this._modelValue();
 			const parsedValue = this._parse(value);
 
 			if (target[key] === parsedValue) { return }
