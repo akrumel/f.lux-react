@@ -1,3 +1,4 @@
+import isString from "lodash.isstring";
 import result from "lodash.result";
 
 
