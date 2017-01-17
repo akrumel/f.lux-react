@@ -129,11 +129,14 @@ export default class FluxWrapper extends Component {
 		const modelValue = this._modelValue(nextProps);
 		const prevModelValue = this._modelValue();
 
-		if (modelValue !== prevModelValue) {
+		if (modelValue !== prevModelValue && (this.flushValueSet && modelValue !== this.flushValue)) {
 			this.setState({
 					value: this._formattedPropValue(nextProps),
 				});
 		}
+
+		delete this.flushValue;
+		delete this.flushValueSet;
 	}
 
 	getChildContext () {
@@ -147,14 +150,16 @@ export default class FluxWrapper extends Component {
 
 	flush() {
 		return new Promise( (resolve, reject) => {
-			this._updateValue( (currModel, error) => {
+			this.flushValue = this._updateValue( (currModel, error) => {
 				if (error) {
 					reject(error);
 				} else {
 					resolve(model);
 				}
-			})
-		})
+			});
+
+			this.flushValueSet = true;
+		});
 	}
 
 	_formattedPropValue(props=this.props) {
@@ -184,19 +189,30 @@ export default class FluxWrapper extends Component {
 		const { checked, value } = event.target;
 		const nextModelValue = this._isCheckedType() ?checked :value;
 
-		if (onChange) {
-			event.persist();
+		// Cannot reuse event as noted below but keep for now (1/7/2017)
+		// if (onChange) {
+		// 	event.persist();
 
-			event.target.value = nextModelValue;
-		}
+		// 	event.target.value = nextModelValue;
+		// }
 
 		this.setState(
 			{
 				value: nextModelValue,
 			},
 			() => {
-				// really need to generate a new event using this as target
-				onChange && onChange(event);
+				if (onChange) {
+					// this is causing the cursor to jump to end of input (strange)
+					//event.target.value = nextModelValue;
+
+					// create a really shallow and dumb event (should meet our needs for now). Really
+					// need to create an actual event to propagate.
+					onChange({
+						target: {
+							value: nextModelValue
+						}
+					})
+				}
 
 				if (this._shouldFlushOnChange()) {
 					this._updateValue();
@@ -326,6 +342,8 @@ export default class FluxWrapper extends Component {
 
 			callback && callback(model, error);
 		}
+
+		return nextModelValue;
 	}
 
 	render() {
