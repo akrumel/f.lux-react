@@ -6,7 +6,7 @@ import { Component, PropTypes, Children } from "react";
 var didWarnAboutReceivingStore = false;
 
 function warnAboutReceivingStore() {
-	if (didWarnAboutReceivingStore) { return; }
+	if (didWarnAboutReceivingStore) { return }
 
 	didWarnAboutReceivingStore = true;
 
@@ -16,16 +16,16 @@ function warnAboutReceivingStore() {
 }
 
 export default class Provider extends Component {
-	getChildContext() {
-		return { 
-				store: this.store
-			};
-	}
-
 	constructor(props, context) {
 		super(props, context);
 
 		this.store = props.store;
+	}
+
+	getChildContext() {
+		return {
+				store: this.store
+			};
 	}
 
 	render() {
