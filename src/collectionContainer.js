@@ -158,7 +158,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 				}
 
 				return backup.restore(error)
-					.then( () => this.setState({ restored: true }) )
+					.then( () => this.state.mounted && this.setState({ restored: true }) )
 					.catch( restoreError => Store.reject(error) );
 			}
 
