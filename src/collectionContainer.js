@@ -45,6 +45,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 
 				this.state = {
 					error: null,
+					restored: false,
 				};
 			}
 
@@ -70,6 +71,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 			}
 
 			checkForCollectionChange(props) {
+				const { error, restored } = this.state;
 				const collection = props[collectionPropName];
 				const endpointId = collection && collection.endpoint && collection.endpoint.id;
 				const prevCollection = this.collection;
@@ -88,7 +90,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 
 					this.endpointId = endpointId;
 
-					if (this.collection.isConnected() && !this.syncCalled() && !this.state.error) {
+					if (this.collection.isConnected() && !this.syncCalled() && !error && !restored) {
 						this.sync();
 					} else if (this.state.error && (collection.synced ||
 							(prevCollection && collection.nextOffset !== prevCollection.nextOffset)))
@@ -156,6 +158,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 				}
 
 				return backup.restore(error)
+					.then( () => this.setState({ restored: true }) )
 					.catch( restoreError => Store.reject(error) );
 			}
 
@@ -181,7 +184,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 					`explicitly pass "${collectionPropName}" as a prop to <${this.constructor.displayName}>.`
 				)
 
-				this.setState({ error: null });
+				this.setState({ error: null, restored: false });
 
 				if (page) {
 					if (!this.collection.fetching && !this.collection.paging) {
