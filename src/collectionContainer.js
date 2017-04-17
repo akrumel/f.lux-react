@@ -40,6 +40,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 				this.model = null;
 				this.modelId = null;
 				this.startFetchTime = null;
+				this.mounted = true;
 
 				this.displayName = getDisplayName(WrappedComponent);
 
@@ -50,7 +51,6 @@ export default function collectionContainer(collectionPropName, options={}) {
 			}
 
 			componentWillMount() {
-				this.state.mounted = true;
 				this.checkForCollectionChange(this.props);
 
 				if (this.collection && this.collection.isConnected()) {
@@ -67,7 +67,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 			}
 
 			componentWillUnmount() {
-				this.state.mounted = false;
+				this.mounted = false;
 			}
 
 			checkForCollectionChange(props) {
@@ -119,7 +119,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 				const msg = `Unable to sync collection "${collectionPropName}" for component ` +
 					`${getDisplayName(WrappedComponent)} due to error: ${error}`;
 
-				if (this.state.mounted) {
+				if (this.mounted) {
 					this.setState({ error: error });
 				}
 			}
@@ -151,15 +151,13 @@ export default function collectionContainer(collectionPropName, options={}) {
 
 			@autobind
 			restoreOnError(error) {
-				const backup = this.collection.$$().getOfflineState();
-
-				if (!backup) {
+				if (this.collection.restored) {
+					if (this.mounted) {
+						this.setState({ restored: true });
+					}
+				} else {
 					return Store.reject(error);
 				}
-
-				return backup.restore(error)
-					.then( () => this.state.mounted && this.setState({ restored: true }) )
-					.catch( restoreError => Store.reject(error) );
 			}
 
 			resync() {
@@ -201,19 +199,11 @@ export default function collectionContainer(collectionPropName, options={}) {
 
 			syncCalled() {
 				const collection = this.collection;
-				const backup = collection && this.collection.$$().getOfflineState();
 
 				return collection && (
-					(collection.fetching || collection.synced) ||
-					(page && (collection.paging || collection.nextOffset != 0)) ||
-					(backup && backup.inProgress) );
-			}
-
-			backupInProgress() {
-				const collection = this.collection;
-				const backup = collection && this.collection.$$().getOfflineState();
-
-				return backup && backup.inProgress;
+						(collection.fetching || collection.synced) ||
+						(page && (collection.paging || collection.nextOffset != 0))
+					);
 			}
 
 			render() {
@@ -222,7 +212,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 
 				if (HourglassComponent) {
 					if (collection && collection.size===0 && collection.isConnected() &&
-						(this.backupInProgress() || collection.fetching || collection.paging))
+						(collection.fetching || collection.paging))
 					{
 						if (!this.hourglass) {
 							this.hourglass = createElement(HourglassComponent, mergedProps);
