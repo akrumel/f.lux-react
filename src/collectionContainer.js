@@ -5,6 +5,9 @@ import { Component, createElement, PropTypes } from "react";
 
 import { Store } from "f.lux";
 
+import CollectionHandler from "./CollectionHandler";
+
+
 // http://stackoverflow.com/questions/1026069/capitalize-the-first-letter-of-string-in-javascript
 function capitalize(s) {
 	return s && s[0].toUpperCase() + s.slice(1);
@@ -34,9 +37,10 @@ export default function collectionContainer(collectionPropName, options={}) {
 				// Helps track hot reloading.
 				this.version = version;
 
-				this.collection = props[collectionPropName];
+				this.handlers = Array.isArray(collectionPropName)
+					?collectionPropName.map( n => new CollectionHandler(this, n, page, resync) )
+					:[ new CollectionHandler(this, collectionPropName, page, resync) ];
 
-				this.endpointId = this.collection && this.collection.endpoint && this.collection.endpoint.id;
 				this.model = null;
 				this.modelId = null;
 				this.startFetchTime = null;
@@ -44,22 +48,11 @@ export default function collectionContainer(collectionPropName, options={}) {
 
 				this.displayName = getDisplayName(WrappedComponent);
 
-				this.state = {
-					error: null,
-					restored: false,
-				};
+				this.state = { };
 			}
 
 			componentWillMount() {
-				this.checkForCollectionChange(this.props);
-
-				if (this.collection && this.collection.isConnected()) {
-					if (!this.syncCalled()) {
-						this.sync();
-					} else if (resync) {
-						this.resync();
-					}
-				}
+				this.handlers.forEach( h => h.init() );
 			}
 
 			componentWillReceiveProps(nextProps) {
@@ -71,57 +64,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 			}
 
 			checkForCollectionChange(props) {
-				const { error, restored } = this.state;
-				const collection = props[collectionPropName];
-				const endpointId = collection && collection.endpoint && collection.endpoint.id;
-				const prevCollection = this.collection;
-
-				if (collection === this.collection) { return }
-
-				this.collection = collection;
-
-				if (!collection) {
-					this.endpointId = null;
-					this.clearError();
-				} else {
-					 if (this.endpointId !== endpointId) {
-						this.clearError();
-					}
-
-					this.endpointId = endpointId;
-
-					if (this.collection.isConnected() && !this.syncCalled() && !error && !restored) {
-						this.sync();
-					} else if (this.state.error && (collection.synced ||
-							(prevCollection && collection.nextOffset !== prevCollection.nextOffset)))
-					{
-						this.setState({ error: null });
-					}
-				}
-			}
-
-			@autobind
-			clearError(resync) {
-				if (!this.state.error) { return }
-
-				this.setState(
-					{ error: null },
-					() => {
-							if (resync && this.collection.isConnected()) {
-								this.sync();
-							}
-						}
-					);
-			}
-
-			@autobind
-			fetchError(error) {
-				const msg = `Unable to sync collection "${collectionPropName}" for component ` +
-					`${getDisplayName(WrappedComponent)} due to error: ${error}`;
-
-				if (this.mounted) {
-					this.setState({ error: error });
-				}
+				this.handlers.forEach( h => h.checkForCollectionChange(props) );
 			}
 
 			getWrappedInstance() {
@@ -141,79 +84,32 @@ export default function collectionContainer(collectionPropName, options={}) {
 			}
 
 			mergeProps() {
+				const handlerProps = this.handlers.reduce( (acc, h) => {
+						acc[`${collectionPropName}Error`] = h.error;
+						acc[`clear${capitalize(collectionPropName)}Error`] = h.clearErrorAndResync;
+						acc[`sync${capitalize(collectionPropName)}`] = h.sync;
+
+						return acc;
+					}, {});
+
 				return {
 					...this.props,
-					[`${collectionPropName}Error`]: this.state.error,
-					[`clear${capitalize(collectionPropName)}Error`]: this.clearError,
-					[`sync${capitalize(collectionPropName)}`]: this.sync,
+					...handlerProps,
 				}
-			}
-
-			@autobind
-			restoreOnError(error) {
-				if (this.collection.restored) {
-					if (this.mounted) {
-						this.setState({ restored: true });
-					}
-				} else {
-					return Store.reject(error);
-				}
-			}
-
-			resync() {
-				invariant(this.collection, `Could not find "${collectionPropName}" in the props of ` +
-					`<${this.constructor.displayName}>. Either wrap the root component in a storeContainer(), or ` +
-					`explicitly pass "${collectionPropName}" as a prop to <${this.constructor.displayName}>.`
-				)
-
-				return this.collection.resync()
-					.catch(this.restoreOnError)
-					.catch(this.fetchError);
-			}
-
-			@autobind
-			sync(mergeOp) {
-				if (this.syncCalled() || (this.collection && !this.collection.isConnected()) ) {
-					return
-				}
-
-				invariant(this.collection, `Could not find "${collectionPropName}" in the props of ` +
-					`<${this.constructor.displayName}>. Either wrap the root component in a storeContainer(), or ` +
-					`explicitly pass "${collectionPropName}" as a prop to <${this.constructor.displayName}>.`
-				)
-
-				this.setState({ error: null, restored: false });
-
-				if (page) {
-					if (!this.collection.fetching && !this.collection.paging) {
-						this.collection.fetchNext(mergeOp)
-							.catch(this.restoreOnError)
-							.catch(this.fetchError);
-					}
-				} else {
-					this.collection.fetch(null, mergeOp)
-						.catch(this.restoreOnError)
-						.catch(this.fetchError);
-				}
-			}
-
-			syncCalled() {
-				const collection = this.collection;
-
-				return collection && (
-						(collection.fetching || collection.synced) ||
-						(page && (collection.paging || collection.nextOffset != 0))
-					);
 			}
 
 			render() {
 				const mergedProps = this.mergeProps();
-				const collection = this.collection;
 
 				if (HourglassComponent) {
-					if (collection && collection.size===0 && collection.isConnected() &&
-						(collection.fetching || collection.paging))
-					{
+					const showHourglass = this.handlers.some( h => {
+							const collection = h.collection;
+
+							return collection && collection.size===0 && collection.isConnected() &&
+								(collection.fetching || collection.paging)
+						});
+
+					if (showHourglass) {
 						if (!this.hourglass) {
 							this.hourglass = createElement(HourglassComponent, mergedProps);
 						}
