@@ -167,7 +167,7 @@ export default class CollectionHandler {
 	_syncCollection(collection, mergeOp) {
 		const { collectionPropName, container, page } = this;
 
-		if (this.syncCalled(collection) || (collection && !collection.isConnected()) ) {
+		if (!collection || !collection.isConnected() || this.syncCalled(collection) || collection.restoring) {
 			return
 		}
 
