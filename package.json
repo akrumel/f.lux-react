@@ -1,6 +1,6 @@
 {
   "name": "f.lux-react",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Official React bindings for f.lux",
   "author": "Andy Krumel",
   "license": "MIT",
