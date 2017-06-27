@@ -9,6 +9,7 @@ export default class CollectionHandler {
 		this.container = container;
 		this.collectionPropName = collectionPropName;
 		this.page = page;
+		this.resync = resync;
 
 		this.errorStateName = `${ collectionPropName }Error`
 		this.restoredStateName = `${ collectionPropName }Restored`
@@ -45,7 +46,7 @@ export default class CollectionHandler {
 			if (!this.syncCalled()) {
 				this.sync();
 			} else if (resync) {
-				this.resync();
+				this.resyncNow();
 			}
 		}
 	}
@@ -116,7 +117,7 @@ export default class CollectionHandler {
 		}
 	}
 
-	resync(collection=this.collection) {
+	resyncNow(collection=this.collection) {
 		const { collectionPropName, container } = this;
 
 		invariant(collection, `Could not find "${collectionPropName}" in the props of ` +
