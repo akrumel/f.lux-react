@@ -186,7 +186,7 @@ export default class FluxInput extends Component {
 		return <input { ...inputProps }
 				ref="input"
 				disabled={ model.$().isReadonly() || disabled }
-				value={ value }
+				value={ value || "" }
 				onBlur={ event => this._handleBlur(event) }
 				onChange={ event => this._handleChange(event) }
 				onFocus={ event => this._handleFocus(event) }

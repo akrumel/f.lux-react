@@ -5,11 +5,11 @@ import { Store } from "f.lux";
 
 
 export default class CollectionHandler {
-	constructor(container, collectionPropName, page, resync) {
+	constructor(container, collectionPropName, page, resyncOnInit) {
 		this.container = container;
 		this.collectionPropName = collectionPropName;
 		this.page = page;
-		this.resync = resync;
+		this.resyncOnInit = resyncOnInit;
 
 		this.errorStateName = `${ collectionPropName }Error`
 		this.restoredStateName = `${ collectionPropName }Restored`
@@ -38,15 +38,15 @@ export default class CollectionHandler {
 	}
 
 	init() {
-		const { collection, resync } = this;
+		const { collection, resyncOnInit } = this;
 
 		this.checkForCollectionChange();
 
 		if (collection && collection.isConnected()) {
 			if (!this.syncCalled()) {
 				this.sync();
-			} else if (resync) {
-				this.resyncNow();
+			} else if (resyncOnInit) {
+				this.resync();
 			}
 		}
 	}
@@ -83,7 +83,7 @@ export default class CollectionHandler {
 		this.setState(
 			{ [this.errorStateName]: null },
 			() => {
-					if (this.resync) {
+					if (this.resyncOnInit) {
 						this._syncCollection(collection);
 					}
 				}
@@ -117,7 +117,7 @@ export default class CollectionHandler {
 		}
 	}
 
-	resyncNow(collection=this.collection) {
+	resync(collection=this.collection) {
 		const { collectionPropName, container } = this;
 
 		invariant(collection, `Could not find "${collectionPropName}" in the props of ` +
