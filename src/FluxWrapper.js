@@ -379,6 +379,7 @@ FluxWrapper.defaultProps = {
 	flushOnChange: false,
 	flushOnEnter: true,
 	format: identity,
+	onChangeTx: identity,
 	parse: identity,
 }
 
