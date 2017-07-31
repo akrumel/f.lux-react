@@ -85,9 +85,9 @@ export default function collectionContainer(collectionPropName, options={}) {
 
 			mergeProps() {
 				const handlerProps = this.handlers.reduce( (acc, h) => {
-						acc[`${collectionPropName}Error`] = h.error;
-						acc[`clear${capitalize(collectionPropName)}Error`] = h.clearErrorAndResync;
-						acc[`sync${capitalize(collectionPropName)}`] = h.sync;
+						acc[`${h.collectionPropName}Error`] = h.error;
+						acc[`clear${capitalize(h.collectionPropName)}Error`] = h.clearErrorAndResync;
+						acc[`sync${capitalize(h.collectionPropName)}`] = h.sync;
 
 						return acc;
 					}, {});
