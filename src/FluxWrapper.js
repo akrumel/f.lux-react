@@ -174,7 +174,7 @@ export default class FluxWrapper extends Component {
 
 		this.setState({
 				hasFocus: false,
-				focusValue: null,    //autosave will have already occurred so can clear
+				focusValue: null,
 			},
 			() => {
 				this._updateValue();
