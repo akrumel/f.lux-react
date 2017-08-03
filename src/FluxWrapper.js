@@ -128,8 +128,15 @@ export default class FluxWrapper extends Component {
 	componentWillReceiveProps(nextProps, nextContext) {
 		const modelValue = this._modelValue(nextProps);
 		const prevModelValue = this._modelValue();
+		const access = nextProps.model && nextProps.model.$();
 
-		if (modelValue !== prevModelValue && (this.flushValueSet && modelValue !== this.flushValue)) {
+		if (modelValue !== prevModelValue &&
+			(
+				this.flushValueSet && modelValue !== this.flushValue ||
+				(acess && access.isDirty && !access.isDirty())
+			))
+		{
+
 			this.setState({
 					value: this._formattedPropValue(nextProps),
 				});

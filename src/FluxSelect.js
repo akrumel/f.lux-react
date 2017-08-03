@@ -95,7 +95,7 @@ export default class FluxSelect extends Component {
 	render() {
 		const { disabled, format, model } = this.props;
 		const modelValue = this._modelValue();
-		const value = format(modelValue);
+		const value = format(modelValue) || "";
 		const inputProps = omit(this.props, propNamesBlacklist);
 
 		return <select { ...inputProps }
