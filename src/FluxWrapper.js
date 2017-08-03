@@ -133,7 +133,7 @@ export default class FluxWrapper extends Component {
 		if (modelValue !== prevModelValue &&
 			(
 				this.flushValueSet && modelValue !== this.flushValue ||
-				(acess && access.isDirty && !access.isDirty())
+				(access && access.isDirty && !access.isDirty())
 			))
 		{
 
