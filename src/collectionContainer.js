@@ -51,7 +51,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 				this.state = { };
 			}
 
-			componentWillMount() {
+			componentDidMount() {
 				this.handlers.forEach( h => h.init() );
 			}
 

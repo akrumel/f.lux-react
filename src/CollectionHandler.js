@@ -3,6 +3,8 @@ import invariant from "invariant";
 
 import { Store } from "f.lux";
 
+import InteractionManager from "./InteractionManager";
+
 
 export default class CollectionHandler {
 	constructor(container, collectionPropName, page, resyncOnInit) {
@@ -166,29 +168,31 @@ export default class CollectionHandler {
 	}
 
 	_syncCollection(collection, mergeOp) {
-		const { collectionPropName, container, page } = this;
+		InteractionManager.runAfterInteractions( () => {
+			const { collectionPropName, container, page } = this;
 
-		if (!collection || !collection.isConnected() || this.syncCalled(collection) || collection.restoring) {
-			return
-		}
+			if (!collection || !collection.isConnected() || this.syncCalled(collection) || collection.restoring) {
+				return
+			}
 
-		invariant(collection, `Could not find "${collectionPropName}" in the props of ` +
-			`<${container.constructor.displayName}>. Either wrap the root component in a storeContainer(), or ` +
-			`explicitly pass "${collectionPropName}" as a prop to <${container.constructor.displayName}>.`
-		)
+			invariant(collection, `Could not find "${collectionPropName}" in the props of ` +
+				`<${container.constructor.displayName}>. Either wrap the root component in a storeContainer(), or ` +
+				`explicitly pass "${collectionPropName}" as a prop to <${container.constructor.displayName}>.`
+			)
 
-		this.clearState();
+			this.clearState();
 
-		if (page) {
-			if (!collection.fetching && !collection.paging) {
-				collection.fetchNext(mergeOp)
+			if (page) {
+				if (!collection.fetching && !collection.paging) {
+					collection.fetchNext(mergeOp)
+						.catch( error => this.restoreOnError(error) )
+						.catch( error => this.fetchError(error) );
+				}
+			} else {
+				collection.fetch(null, mergeOp)
 					.catch( error => this.restoreOnError(error) )
 					.catch( error => this.fetchError(error) );
 			}
-		} else {
-			collection.fetch(null, mergeOp)
-				.catch( error => this.restoreOnError(error) )
-				.catch( error => this.fetchError(error) );
-		}
+		});
 	}
 }
