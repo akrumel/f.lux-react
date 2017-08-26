@@ -58,7 +58,7 @@ export default class CollectionHandler {
 		const nextCollection = props[collectionPropName];
 		const nextEpId = nextCollection && nextCollection.endpoint && nextCollection.endpoint.id;
 
-		if (nextCollection === currCollection) { return }
+		if (nextCollection === currCollection && this.syncCalled(currCollection)) { return }
 
 		// NOTE: this.collection is still currCollection NOT nextCollection
 		if (!nextCollection) {
