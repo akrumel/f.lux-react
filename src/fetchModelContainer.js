@@ -4,6 +4,8 @@ import { Component, createElement } from "react";
 import hoistStatics from "hoist-non-react-statics";
 import invariant from "invariant";
 
+import InteractionManager from "./InteractionManager";
+
 
 // http://stackoverflow.com/questions/1026069/capitalize-the-first-letter-of-string-in-javascript
 function capitalize(s) {
@@ -27,8 +29,11 @@ var nextVersion = 0;
 				the model can be accessed using this.props.foo (required)
 		* collectionPropName - property name where the f.lux collection can be found on the properties. This
 				container does not utilize the context. (required)
-		* options - current supports a single property of 'withRef' which if true specifies the
-				ref="wrappedInstance" for the wrapped element.
+		* options
+			- `idProp` - property name containing the model's id. If set, the model is
+				automatically retrieved in `componentDidMount()`.
+			- `withRef` - `true` specifies the ref="wrappedInstance" for the wrapped element
+				(default=false).
 
 	The container sets up the following functions and values on the proeprties object based on the two parameters
 	(assume parameters modelName='user' and fluxStoreName='userStore'):
@@ -41,8 +46,10 @@ var nextVersion = 0;
 		5) this.props.fetchUserCalled() - gets if a previous call to fetchUser() has been made. Useful for
 				componentDidUpdate() guards to prevent unnecessary fetch calls.
 		6) this.props.isFetchingUser() - returns true if fetching is in progress
-		7) this.prpos.user` - the fetched model.
-		8) this.prpos.userId` - the ID of the model [being] fetched.
+		7) this.props.refrectModel(modelId) - trigger a call to fetchUser(modelId, true) with the force
+				flag set to true.
+		8) this.prpos.user` - the fetched model.
+		9) this.prpos.userId` - the ID of the model [being] fetched.
 
 	Lifecycle (assume modelName='user':
 		Not fetched: this.props.user is null/undefined and this.props.isFetchingUser() returns false
@@ -50,7 +57,7 @@ var nextVersion = 0;
 		Fetched: this.props.user contains the model instance and this.isFetchingUser() returns false
 */
 export default function fetchModelContainer(modelName, collectionPropName, options={}) {
-	const { withRef = false } = options;
+	const { idProp=null, withRef=false } = options;
 	const progressStateProp = `${modelName}Fetching`;
 
 	// Helps track hot reloading.
@@ -84,6 +91,14 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 				this.clearCache();
 			}
 
+			componentDidMount() {
+				const modelId = idProp && this.props[idProp];
+
+				if (modelId && this.modelId != modelId) {
+					InteractionManager.runAfterInteractions( () => this.fetchModel(modelId, true) );
+				}
+			}
+
 			componentWillUnmount() {
 				this.mounted = false;
 			}
@@ -104,6 +119,8 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 					this.endpointId = null;
 					this.clearModel();
 				} else {
+					const nextModelId = idProp && this.props[idProp];
+
 					 if (this.endpointId !== collection.endpoint.id) {
 						// TODO - should the model be refetched?
 
@@ -112,7 +129,13 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 					this.endpointId = collection.endpoint.id;
 
-					if (this.modelId) {
+					if (idProp && nextModelId != this.modelId) {
+						this.clearModel();
+						this.clearError();
+						InteractionManager.runAfterInteractions(
+								() => this.fetchModel(nextModelId, true)
+							);
+					} else if (this.modelId) {
 						this.model = collection.get(this.modelId);
 					}
 				}
@@ -151,6 +174,8 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 			@autobind
 			fetchModel(modelId, force=false) {
+				modelId = modelId || (idProp && this.props[idProp]);
+
 				if ((this.startFetchTime || this.modelId) && !force) { return }
 
 				invariant(this.collection, `Could not find "${collectionPropName}"" in the props of ` +
@@ -194,11 +219,10 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 					.catch( error => {
 						// only report errors for most recent request
 						if (this.startFetchTime == time) {
-							// unset the current user and progress state flag
 							if (this.mounted) {
 								this.setState({
 										isFetching: false,
-										error: error
+										error
 									});
 							}
 
@@ -247,10 +271,16 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 					[`fetch${capitalize(modelName)}`]: this.fetchModel,
 					[`fetch${capitalize(modelName)}Called`]: this.fetchCalled,
 					[`isFetching${capitalize(modelName)}`]: this.isFetching,
+					[`refetch${capitalize(modelName)}`]: this.refetchModel,
 					[modelName]: this.model,
 					[`${modelName}Id`]: this.state.modelId,
 					[`${modelName}Error`]: this.state.error,
 				}
+			}
+
+			@autobind
+			refetchModel(modelId) {
+				this.fetchModel(modelId, true);
 			}
 
 			render() {
