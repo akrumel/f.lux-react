@@ -1,6 +1,7 @@
 import omit from "lodash.omit";
 import result from "lodash.result";
-import React, { Component, PropTypes } from "react";
+import PropTypes from 'prop-types';
+import React, { Component } from "react";
 
 import baseModel from "./baseModel";
 import identity from "./identity";

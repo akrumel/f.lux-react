@@ -1,16 +1,19 @@
+import classnames from "classnames";
+import omit from "lodash.omit";
+
 // This code borrowed with permission from f.lux-react and then modified to match
 // solidify-flux differences
 
-import classnames from "classnames";
-import omit from "lodash.omit";
-import React, { Component, PropTypes } from "react";
+import PropTypes from 'prop-types';
+
+import React, { Component } from "react";
 import result from "lodash.result";
 
 import baseModel from "./baseModel";
 import identity from "./identity";
 
 const typeSpec = {
-	errors: React.PropTypes.object
+	errors: PropTypes.object
 };
 
 const propNamesBlacklist = [
@@ -395,7 +398,7 @@ FluxWrapper.propTypes = {
 			  PropTypes.string,
 			  PropTypes.number
 		  ]).isRequired,
-	children: React.PropTypes.element.isRequired,
+	children: PropTypes.element.isRequired,
 	checkedType: PropTypes.bool,
 	disabled: PropTypes.bool,
 	flushOnChange: PropTypes.bool,

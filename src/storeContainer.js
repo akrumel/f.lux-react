@@ -1,10 +1,13 @@
-// Based on Redux connect()
-
 import autobind from "autobind-decorator";
 import hoistStatics from "hoist-non-react-statics";
 import invariant from "invariant";
 import isPlainObject from "lodash.isplainobject";
-import { Component, createElement, PropTypes } from "react";
+
+// Based on Redux connect()
+
+import PropTypes from 'prop-types';
+
+import { Component, createElement } from "react";
 
 import { shallowEqual } from "akutils";
 

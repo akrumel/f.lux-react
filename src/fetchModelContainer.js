@@ -1,5 +1,6 @@
 import autobind from "autobind-decorator";
-import { Component, createElement, PropTypes } from "react";
+import PropTypes from 'prop-types';
+import { Component, createElement } from "react";
 import hoistStatics from "hoist-non-react-statics";
 import invariant from "invariant";
 

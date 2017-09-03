@@ -1,6 +1,8 @@
 // Borrowed-from/Based-on Redux Provider class (https://github.com/reactjs/react-redux/blob/master/src/components/Provider.js)
 
-import { Component, PropTypes, Children } from "react";
+import PropTypes from 'prop-types';
+
+import { Component, Children } from "react";
 
 
 var didWarnAboutReceivingStore = false;
