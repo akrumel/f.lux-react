@@ -54,9 +54,10 @@ export default class CollectionHandler {
 	}
 
 	checkForCollectionChange(props=this.props) {
-		const { collectionPropName, collection: currCollection, endpointId: currEpId, error, restored } = this;
+		const { collectionPropName, collection: currCollection, endpointId: currEpId, error } = this;
 		const nextCollection = props[collectionPropName];
 		const nextEpId = nextCollection && nextCollection.endpoint && nextCollection.endpoint.id;
+		const restored = this.isRestored();
 
 		if (nextCollection === currCollection && this.syncCalled(currCollection)) { return }
 
@@ -105,6 +106,16 @@ export default class CollectionHandler {
 	fetchError(error) {
 		if (this.container.mounted) {
 			this.setError(error);
+		}
+	}
+
+	isRestored() {
+		const { container, restoredStateName } = this;
+
+		if (container.mounted) {
+			return container.state[restoredStateName];
+		} else {
+			return true;
 		}
 	}
 
