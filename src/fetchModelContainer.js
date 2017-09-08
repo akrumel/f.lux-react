@@ -86,13 +86,14 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 			}
 
 			componentWillMount() {
-				this.mounted = true;
 				this.checkForCollectionChange(this.props);
 				this.clearCache();
 			}
 
 			componentDidMount() {
 				const modelId = idProp && this.props[idProp];
+
+				this.mounted = true;
 
 				if (modelId && this.modelId != modelId) {
 					InteractionManager.runAfterInteractions( () => this.fetchModel(modelId, true) );
@@ -260,7 +261,7 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 			@autobind
 			isFetching() {
-				return this.state.isFetching;
+				return this.state.isFetching || !this.mounted;
 			}
 
 			mergeProps() {
