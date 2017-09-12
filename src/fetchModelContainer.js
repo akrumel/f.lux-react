@@ -196,7 +196,6 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 							error: null,
 						});
 				}
-
 				this.collection.find(modelId)
 					.then( model => {
 							if (this.startFetchTime != time) {
@@ -261,7 +260,7 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 			@autobind
 			isFetching() {
-				return this.state.isFetching || !this.mounted;
+				return this.state.isFetching || this.startFetchTime || !this.mounted;
 			}
 
 			mergeProps() {
