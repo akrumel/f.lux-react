@@ -374,7 +374,6 @@ export default class FluxWrapper extends Component {
 		childProps.onKeyPress = event => this._handleKeyPress(event)
 		childProps.value = value === undefined ?null :value;
 
-console.log("FLUX WRAPPER", this.props.bind, this.props.tracking, model && model[this.props.bind], childProps)
 		if (this._isCheckedType()) {
 			childProps.checked = !!value;
 		}
