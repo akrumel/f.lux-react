@@ -136,7 +136,8 @@ export default class FluxWrapper extends Component {
 		if (modelValue !== prevModelValue &&
 			(
 				this.flushValueSet && modelValue !== this.flushValue ||
-				(access && access.isDirty && !access.isDirty())
+				(access && access.isDirty && !access.isDirty()) ||
+				!this.state.focus
 			))
 		{
 
@@ -373,6 +374,7 @@ export default class FluxWrapper extends Component {
 		childProps.onKeyPress = event => this._handleKeyPress(event)
 		childProps.value = value === undefined ?null :value;
 
+console.log("FLUX WRAPPER", this.props.bind, this.props.tracking, model && model[this.props.bind], childProps)
 		if (this._isCheckedType()) {
 			childProps.checked = !!value;
 		}
