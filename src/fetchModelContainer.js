@@ -76,7 +76,7 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 				this.model = null;
 				this.modelId = null;
 				this.startFetchTime = null;
-
+				this.mounted = true;
 				this.displayName = getDisplayName(WrappedComponent);
 
 				this.state = {
@@ -92,8 +92,6 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 			componentDidMount() {
 				const modelId = idProp && this.props[idProp];
-
-				this.mounted = true;
 
 				if (modelId && this.modelId != modelId) {
 					InteractionManager.runAfterInteractions( () => this.fetchModel(modelId, true) );
@@ -219,15 +217,15 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 					.catch( error => {
 						// only report errors for most recent request
 						if (this.startFetchTime == time) {
+							// remove the timestamp
+							this.startFetchTime = null;
+
 							if (this.mounted) {
 								this.setState({
 										isFetching: false,
 										error
 									});
 							}
-
-							// remove the timestamp
-							this.startFetchTime = null;
 						}
 
 						console.warn(
@@ -260,7 +258,7 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 			@autobind
 			isFetching() {
-				return this.state.isFetching || this.startFetchTime || !this.mounted;
+				return (this.state.isFetching || this.startFetchTime) && this.mounted;
 			}
 
 			mergeProps() {
