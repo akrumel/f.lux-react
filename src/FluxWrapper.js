@@ -303,19 +303,24 @@ export default class FluxWrapper extends Component {
 	}
 
 	_updateValue(callback) {
-		const { bind, model, onUpdate, parse } = this.props;
+		const { bind, model, onUpdate, format, parse } = this.props;
 		const { value } = this.state;
 		const { target, key } = baseModel(model, bind);
-		var nextModelValue;
+		var nextModelValue, currFormatValue;
 
 		try {
 			nextModelValue = parse(value);
+			currFormatValue = format(target[key]);
 		} catch(ex) {
 			return this._updateError(`parse() error - value=${value}`, ex);
 		}
 
 		try {
-			if (target[key] !== nextModelValue) {
+			/*
+				Compare current bound formatted value too since some formatting can be different
+				for the same value as returned from server, such as rdbms dates.
+			*/
+			if (target[key] !== nextModelValue && currFormatValue !== value) {
 				// update the model property
 				try {
 					target[key] = nextModelValue;
