@@ -1,5 +1,6 @@
 import classnames from "classnames";
 import omit from "lodash.omit";
+import isEqual from "lodash.isequal";
 
 // This code borrowed with permission from f.lux-react and then modified to match
 // solidify-flux differences
@@ -129,11 +130,11 @@ export default class FluxWrapper extends Component {
 	}
 
 	componentWillReceiveProps(nextProps, nextContext) {
-		const modelValue = this._modelValue(nextProps);
-		const prevModelValue = this._modelValue();
+		const modelValue = this._formattedPropValue(nextProps);
+		const prevModelValue = this._formattedPropValue();
 		const access = nextProps.model && nextProps.model.$();
 
-		if (modelValue !== prevModelValue &&
+		if (!isEqual(modelValue, prevModelValue) &&
 			(
 				this.flushValueSet && modelValue !== this.flushValue ||
 				(access && access.isDirty && !access.isDirty()) ||
@@ -246,6 +247,7 @@ export default class FluxWrapper extends Component {
 	_handleKeyPress(event) {
 		const { flushOnEnter, onKeyPress } = this.props;
 
+console.log("KEY PRESS", event.charCode, flushOnEnter, event.target.value)
 		if (event.charCode === 13 && flushOnEnter) {
 			this._updateValue();
 		}
@@ -320,7 +322,7 @@ export default class FluxWrapper extends Component {
 				Compare current bound formatted value too since some formatting can be different
 				for the same value as returned from server, such as rdbms dates.
 			*/
-			if (target[key] !== nextModelValue && currFormatValue !== value) {
+			if (!isEqual(target[key], nextModelValue) && !isEqual(currFormatValue, value)) {
 				// update the model property
 				try {
 					target[key] = nextModelValue;

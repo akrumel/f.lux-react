@@ -10,7 +10,7 @@ export default class TransientManager {
 	lock(trans) {
 		if (trans === this.trans) { return this.transId }
 
-		// unlock old accounts (if exists)
+		// unlock old transient (if exists)
 		this.release();
 
 		if (trans) {
