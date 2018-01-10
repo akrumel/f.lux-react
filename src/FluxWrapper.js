@@ -247,7 +247,6 @@ export default class FluxWrapper extends Component {
 	_handleKeyPress(event) {
 		const { flushOnEnter, onKeyPress } = this.props;
 
-console.log("KEY PRESS", event.charCode, flushOnEnter, event.target.value)
 		if (event.charCode === 13 && flushOnEnter) {
 			this._updateValue();
 		}
@@ -377,7 +376,7 @@ console.log("KEY PRESS", event.charCode, flushOnEnter, event.target.value)
 		childProps.onBlur = event => this._handleBlur(event)
 		childProps.onChange = onChangeTx( event => this._handleChange(event) )
 //		childProps.onChange = event => this._handleChange(event)
-		childProps.onFocus =event => this._handleFocus(event)
+		childProps.onFocus = event => this._handleFocus(event)
 		childProps.onKeyPress = event => this._handleKeyPress(event)
 		childProps.value = value === undefined ?null :value;
 
