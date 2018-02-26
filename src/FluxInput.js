@@ -59,6 +59,10 @@ export default class FluxInput extends Component {
 		})
 	}
 
+	focus() {
+		this.refs && this.refs.input && this.refs.input.focus();
+	}
+
 	isCheckedType() {
 		const { type } = this.props;
 
@@ -76,7 +80,7 @@ export default class FluxInput extends Component {
 		return format(modelValue);
 	}
 
-	_handleBlur(event) {
+	_handleBlur = event => {
 		const { onBlur } = this.props;
 
 		this._updateValue();
@@ -88,10 +92,12 @@ export default class FluxInput extends Component {
 			() => onBlur && onBlur(event) );
 	}
 
-	_handleChange(event) {
+	_handleChange = event => {
 		const { format, onChange, type } = this.props;
 		const { checked, value } = event.target;
 		const nextModelValue = this.isCheckedType() ?checked :value;
+
+		event.persist();
 
 		this.setState(
 			{
@@ -107,14 +113,14 @@ export default class FluxInput extends Component {
 			});
 	}
 
-	_handleFocus(event) {
+	_handleFocus = event => {
 		this.setState({
 				hasFocus: true,
 				focusValue: this._modelValue(),    // will compare on blur to see if value changed
 			});
 	}
 
-	_handleKeyPress(event) {
+	_handleKeyPress = event => {
 		const { flushOnEnter, onKeyPress } = this.props;
 
 		if (event.charCode === 13 && flushOnEnter) {
@@ -188,10 +194,10 @@ export default class FluxInput extends Component {
 				ref="input"
 				disabled={ model.$().isReadonly() || disabled }
 				value={ value || "" }
-				onBlur={ event => this._handleBlur(event) }
-				onChange={ event => this._handleChange(event) }
-				onFocus={ event => this._handleFocus(event) }
-				onKeyPress={ event => this._handleKeyPress(event) }
+				onBlur={ this._handleBlur }
+				onChange={ this._handleChange }
+				onFocus={ this._handleFocus }
+				onKeyPress={ this._handleKeyPress }
 			/>
 	}
 }

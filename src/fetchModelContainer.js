@@ -303,7 +303,6 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 		}
 
 
-
 		if (process.env.NODE_ENV !== "production") {
 			FetchModelContainer.prototype.componentWillUpdate = function componentWillUpdate() {
 				if (this.version === version) {
