@@ -175,7 +175,7 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 			fetchModel(modelId, force=false) {
 				modelId = modelId || (idProp && this.props[idProp]);
 
-				if ((this.startFetchTime || this.modelId) && !force) { return }
+				if ((this.startFetchTime || this.modelId == modelId) && !force) { return }
 
 				invariant(this.collection, `Could not find "${collectionPropName}"" in the props of ` +
 					`<${this.constructor.displayName}>. Wrap the root component in a storeContainer(), or explicitly ` +
@@ -270,6 +270,7 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 					[`fetch${capitalize(modelName)}Called`]: this.fetchCalled,
 					[`isFetching${capitalize(modelName)}`]: this.isFetching,
 					[`refetch${capitalize(modelName)}`]: this.refetchModel,
+					[`fetch${capitalize(modelName)}Id`]: this.modelId,
 					[modelName]: this.model,
 					[`${modelName}Id`]: this.state.modelId,
 					[`${modelName}Error`]: this.state.error,
