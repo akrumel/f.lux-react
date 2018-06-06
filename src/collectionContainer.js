@@ -25,7 +25,7 @@ var nextVersion = 0;
 
 
 export default function collectionContainer(collectionPropName, options={}) {
-	const { page=false, resync=false, withRef=false } = options;
+	const { delay=null, page=false, resync=false, withRef=false } = options;
 
 	// Helps track hot reloading.
 	const version = nextVersion++;
@@ -39,8 +39,8 @@ export default function collectionContainer(collectionPropName, options={}) {
 				this.version = version;
 
 				this.handlers = Array.isArray(collectionPropName)
-					?collectionPropName.map( n => new CollectionHandler(this, n, page, resync) )
-					:[ new CollectionHandler(this, collectionPropName, page, resync) ];
+					?collectionPropName.map( n => new CollectionHandler(this, n, page, resync, delay) )
+					:[ new CollectionHandler(this, collectionPropName, page, resync, delay) ];
 
 				this.model = null;
 				this.modelId = null;
@@ -53,7 +53,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 			}
 
 			componentDidMount() {
-				this.handlers.forEach( h => h.init() );
+				this.handlers.forEach( h => h.init() )
 			}
 
 			componentWillReceiveProps(nextProps) {

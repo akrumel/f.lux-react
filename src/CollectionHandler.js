@@ -7,11 +7,12 @@ import InteractionManager from "./InteractionManager";
 
 
 export default class CollectionHandler {
-	constructor(container, collectionPropName, page, resyncOnInit) {
+	constructor(container, collectionPropName, page, resyncOnInit, delay) {
 		this.container = container;
 		this.collectionPropName = collectionPropName;
 		this.page = page;
 		this.resyncOnInit = resyncOnInit;
+		this.delay = delay;
 
 		this.errorStateName = `${ collectionPropName }Error`
 		this.restoredStateName = `${ collectionPropName }Restored`
@@ -46,9 +47,13 @@ export default class CollectionHandler {
 
 		if (collection && collection.isConnected()) {
 			if (!this.syncCalled()) {
-				this.sync();
+				Number.isInteger(this.delay)
+					?setTimeout(() => this.sync(), this.delay)
+					:this.sync()
 			} else if (resyncOnInit) {
-				this.resync();
+				Number.isInteger(this.delay)
+					?setTimeout(() => this.resync(), this.delay)
+					:this.resync()
 			}
 		}
 	}
