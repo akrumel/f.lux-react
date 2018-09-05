@@ -93,9 +93,9 @@ export default class FluxInput extends Component {
 	}
 
 	_handleChange = event => {
-		const { format, onChange, type } = this.props;
+		const { format, onChange, parse, type } = this.props;
 		const { checked, value } = event.target;
-		const nextModelValue = this.isCheckedType() ?checked :value;
+		const nextModelValue = parse(this.isCheckedType() ?checked :value);
 
 		event.persist();
 
@@ -149,7 +149,7 @@ export default class FluxInput extends Component {
 
 		try {
 			if (target[key] !== value) {
-				target[key] = value;
+				target[key] = parse(value);
 
 				if (onUpdate) {
 					model.$().waitFor( currModel => {
