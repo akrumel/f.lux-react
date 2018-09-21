@@ -272,7 +272,7 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 					[`refetch${capitalize(modelName)}`]: this.refetchModel,
 					[`fetch${capitalize(modelName)}Id`]: this.modelId,
 					[modelName]: this.model,
-					[`${modelName}Id`]: this.state.modelId,
+					[`${modelName}Id`]: this.modelId,
 					[`${modelName}Error`]: this.state.error,
 				}
 			}
