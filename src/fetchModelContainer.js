@@ -1,4 +1,3 @@
-import autobind from "autobind-decorator";
 import PropTypes from 'prop-types';
 import { Component, createElement } from "react";
 import hoistStatics from "hoist-non-react-statics";
@@ -146,15 +145,13 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 				this.startFetchTime = null;
 			}
 
-			@autobind
-			clearError() {
+			clearError = () => {
 				if (this.mounted) {
 					this.setState({ error: null });
 				}
 			}
 
-			@autobind
-			clearModel() {
+			clearModel = () => {
 				this.model = null;
 				this.modelId = null;
 				this.startFetchTime = null;
@@ -166,13 +163,11 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 				}
 			}
 
-			@autobind
-			fetchCalled() {
+			fetchCalled = () => {
 				return this.modelId || this.startFetchTime;
 			}
 
-			@autobind
-			fetchModel(modelId, force=false) {
+			fetchModel = (modelId, force=false) => {
 				modelId = modelId || (idProp && this.props[idProp]);
 
 				if ((this.startFetchTime || this.modelId == modelId) && !force) { return }
@@ -256,8 +251,7 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 				return wrapped;
 			}
 
-			@autobind
-			isFetching() {
+			isFetching = () => {
 				return (this.state.isFetching || this.startFetchTime) && this.mounted;
 			}
 
@@ -277,9 +271,9 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 				}
 			}
 
-			@autobind
-			refetchModel(modelId) {
-				this.fetchModel(modelId, true);
+			refetchModel = () => {
+
+				this.fetchModel(this.modelId, true);
 			}
 
 			render() {
