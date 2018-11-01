@@ -15,6 +15,7 @@ const propNamesBlacklist = [
 	'flushOnEnter',
 	'format',
 	'model',
+	'nullOnFalsy',
 	'onBlur',
 	'onChange',
 	'onKeyPress',
@@ -143,13 +144,15 @@ export default class FluxInput extends Component {
 	}
 
 	_updateValue(callback) {
-		const { bind, model, onUpdate, parse } = this.props;
+		const { bind, model, nullOnFalsy, onUpdate, parse } = this.props;
 		const { value } = this.state;
 		const { target, key } = baseModel(model, bind);
 
 		try {
 			if (target[key] !== value) {
-				target[key] = parse(value);
+				const newValue = parse(value);
+
+				target[key] = newValue || !nullOnFalsy ?newValue :null;
 
 				if (onUpdate) {
 					model.$().waitFor( currModel => {
@@ -217,6 +220,7 @@ FluxInput.propTypes = {
 	flushOnEnter: PropTypes.bool,
 	format: PropTypes.func,
 	model: PropTypes.object.isRequired,
+	nullOnFalsy: PropTypes.bool,
 	onBlur: PropTypes.func,
 	onChange: PropTypes.func,
 	onFocus: PropTypes.func,

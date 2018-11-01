@@ -26,6 +26,7 @@ const propNamesBlacklist = [
 	'flushOnEnter',
 	'format',
 	'model',
+	'nullOnFalsy',
 	'onBlur',
 	'onChange',
 	'onChangeTx',
@@ -123,10 +124,11 @@ export default class FluxWrapper extends Component {
 	}
 
 	get value() {
-		const { parse } = this.props;
+		const { nullOnFalsy, parse } = this.props;
 		const { value } = this.state;
+		const curr = parse(value);
 
-		return parse(value);
+		return curr || !nullOnFalsy ?curr :null;
 	}
 
 	componentWillReceiveProps(nextProps, nextContext) {
@@ -304,13 +306,15 @@ export default class FluxWrapper extends Component {
 	}
 
 	_updateValue(callback) {
-		const { bind, model, onUpdate, format, parse } = this.props;
+		const { bind, model, onUpdate, format, nullOnFalsy, parse } = this.props;
 		const { value } = this.state;
 		const { target, key } = baseModel(model, bind);
 		var nextModelValue, currFormatValue;
 
 		try {
-			nextModelValue = parse(value);
+			const newValue = parse(value);
+
+			nextModelValue = newValue || !nullOnFalsy ?newValue :null;
 			currFormatValue = format(target[key]);
 		} catch(ex) {
 			return this._updateError(`parse() error - value=${value}`, ex);
@@ -412,6 +416,7 @@ FluxWrapper.propTypes = {
 	flushOnEnter: PropTypes.bool,
 	format: PropTypes.func,
 	model: PropTypes.object.isRequired,
+	nullOnFalsy: PropTypes.bool,
 	onBlur: PropTypes.func,
 	onChange: PropTypes.func,
 	onChangeTx: PropTypes.func,

@@ -85,17 +85,13 @@ export default class CollectionHandler {
 	}
 
 	@autobind
-	clearErrorAndResync(resync, collection=this.collection) {
+	clearErrorAndResync(collection=this.collection) {
 		if (!this.error) { return }
 
 		this.setState(
 			{ [this.errorStateName]: null },
-			() => {
-					if (this.resyncOnInit) {
-						this._syncCollection(collection);
-					}
-				}
-			);
+			() => this._syncCollection(collection)
+		);
 	}
 
 	clearState() {
@@ -143,7 +139,7 @@ export default class CollectionHandler {
 			`explicitly pass "${collectionPropName}" as a prop to <${container.constructor.displayName}>.`
 		)
 
-		return collection.resync()
+		return collection.fetch()
 			.catch( error => this.restoreOnError(error) )
 			.catch( error => this.fetchError(error) );
 	}
