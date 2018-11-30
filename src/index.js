@@ -1,3 +1,4 @@
+export * from "./validationError";
 
 export { default as collectionContainer } from "./collectionContainer";
 export { default as fetchModelContainer } from "./fetchModelContainer";

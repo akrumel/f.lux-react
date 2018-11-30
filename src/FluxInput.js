@@ -5,7 +5,7 @@ import React, { Component } from "react";
 
 import baseModel from "./baseModel";
 import identity from "./identity";
-
+import { getValidationError, validationErrorClass } from "./validationError";
 
 const propNamesBlacklist = [
 	'bind',
@@ -185,16 +185,23 @@ export default class FluxInput extends Component {
 	}
 
 	render() {
-		const { disabled, model, type } = this.props;
+		const { bind, disabled, model, type } = this.props;
 		const { value } = this.state;
 		const inputProps = omit(this.props, propNamesBlacklist);
+		const verror = getValidationError(bind, model);
+		var className = this.props.className || "";
 
 		if (this.isCheckedType()) {
 			inputProps.checked = value;
 		}
 
+		if (verror) {
+			className = `${className} ${validationErrorClass()}`;
+		}
+
 		return <input { ...inputProps }
 				ref="input"
+				className={ className }
 				disabled={ model.$().isReadonly() || disabled }
 				value={ value || "" }
 				onBlur={ this._handleBlur }
