@@ -189,6 +189,7 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 							error: null,
 						});
 				}
+
 				this.collection.find(modelId)
 					.then( model => {
 							if (this.startFetchTime != time) {

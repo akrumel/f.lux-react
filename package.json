@@ -15,6 +15,7 @@
     "classnames": "^2.2.5",
     "hoist-non-react-statics": "^1.0.5",
     "invariant": "^2.2.1",
+    "lodash.isequal": "^4.5.0",
     "lodash.isplainobject": "^4.0.4",
     "lodash.isstring": "^4.0.1",
     "lodash.omit": "^4.5.0",
@@ -35,7 +36,7 @@
     "rimraf": "^2.5.2"
   },
   "peerDependencies": {
-    "f.lux": "1.*",
+    "f.lux": "^1.4.33",
     "react": "^0.14.0 || ^15.0.0-0"
   },
   "scripts": {
