@@ -147,6 +147,19 @@ export default function searchContainer(modelsName, collectionPropName, options=
 					});
 				}
 
+				if (find) {
+					const models = find(this.collection, this.props);
+
+					if (Array.isArray(models)) {
+						this.startSearchTime = null;
+
+						this.models = single ?models[0] :models;
+						this.mounted && this.setState({ isSearching: false });
+
+						return;
+					}
+				}
+
 				this.collection.search(filter)
 					.then( models => {
 							if (this.startSearchTime != time) {
