@@ -72,9 +72,7 @@ export default class CollectionHandler {
 		} else {
 			 if (currEpId !== nextEpId) {
 				this.clearErrorAndResync(nextCollection);
-			}
-
-			if (nextCollection.isConnected() && !this.syncCalled(nextCollection) && !error && !restored) {
+			} else if (nextCollection.isConnected() && !this.syncCalled(nextCollection) && !error && !restored) {
 				this._syncCollection(nextCollection);
 			} else if (error && (nextCollection.synced ||
 					(currCollection && nextCollection.nextOffset !== currCollection.nextOffset)))
