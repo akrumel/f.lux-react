@@ -191,7 +191,6 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 						});
 				}
 
-if (this.refreshModel) debugger
 				this.collection.find(modelId, this.refreshModel)
 					.then( model => {
 							if (this.startFetchTime != time) {
