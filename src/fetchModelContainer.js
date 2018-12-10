@@ -56,7 +56,7 @@ var nextVersion = 0;
 		Fetched: this.props.user contains the model instance and this.isFetchingUser() returns false
 */
 export default function fetchModelContainer(modelName, collectionPropName, options={}) {
-	const { idProp=null, withRef=false } = options;
+	const { idProp=null, refresh=false, withRef=false } = options;
 	const progressStateProp = `${modelName}Fetching`;
 
 	// Helps track hot reloading.
@@ -77,6 +77,7 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 				this.startFetchTime = null;
 				this.mounted = true;
 				this.displayName = getDisplayName(WrappedComponent);
+				this.refreshModel = refresh;
 
 				this.state = {
 					isFetching: false,
@@ -190,7 +191,8 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 						});
 				}
 
-				this.collection.find(modelId)
+if (this.refreshModel) debugger
+				this.collection.find(modelId, this.refreshModel)
 					.then( model => {
 							if (this.startFetchTime != time) {
 								console.info(
@@ -200,6 +202,9 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 								return;
 							}
+
+							// reset the refresh flag
+							this.refreshModel = false;
 
 							this.startFetchTime = null;
 							this.model = model;
@@ -273,7 +278,6 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 			}
 
 			refetchModel = () => {
-
 				this.fetchModel(this.modelId, true);
 			}
 
