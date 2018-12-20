@@ -70,6 +70,7 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 				// Helps track hot reloading.
 				this.version = version;
 
+				this.store = props.store || context.store;
 				this.collection = props[collectionPropName];
 				this.endpointId = this.collection && this.collection.endpoint.id;
 				this.model = null;
@@ -91,7 +92,7 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 			}
 
 			componentDidMount() {
-				const modelId = idProp && this.props[idProp];
+				const modelId = this.idPropValue();
 
 				if (modelId && this.modelId != modelId) {
 					InteractionManager.runAfterInteractions( () => this.fetchModel(modelId, true) );
@@ -106,10 +107,17 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 				this.checkForCollectionChange(nextProps);
 			}
 
+			idPropValue() {
+				return typeof idProp === 'function'
+					?idProp(this.store._, this.props, this.store)
+					:idProp && this.props[idProp];
+			}
+
 			checkForCollectionChange(props) {
 				const collection = props[collectionPropName];
+				const nextModelId = this.idPropValue();
 
-				if (collection === this.collection) { return }
+				if (collection === this.collection && nextModelId === this.modelId) { return }
 
 				this.collection = collection;
 
@@ -118,8 +126,6 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 					this.endpointId = null;
 					this.clearModel();
 				} else {
-					const nextModelId = idProp && this.props[idProp];
-
 					 if (this.endpointId !== collection.endpoint.id) {
 						// TODO - should the model be refetched?
 
@@ -169,7 +175,7 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 			}
 
 			fetchModel = (modelId, force=false) => {
-				modelId = modelId || (idProp && this.props[idProp]);
+				modelId = modelId || this.idPropValue();
 
 				if ((this.startFetchTime || this.modelId == modelId) && !force) { return }
 
@@ -194,10 +200,10 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 				this.collection.find(modelId, this.refreshModel)
 					.then( model => {
 							if (this.startFetchTime != time) {
-								console.info(
-									`fetchModelContainer::fetchModel() - fetch for ${modelName}:${modelId} @${time} ` +
-									`superceded by @${this.startFetchTime} - force=${force}`
-								);
+								// console.info(
+								// 	`fetchModelContainer::fetchModel() - fetch for ${modelName}:${modelId} @${time} ` +
+								// 	`superceded by @${this.startFetchTime} - force=${force}`
+								// );
 
 								return;
 							}
@@ -299,6 +305,9 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 		FetchModelContainer.propTypes = {
 			[collectionPropName]: PropTypes.object,
+		}
+		FetchModelContainer.contextTypes = {
+			store: PropTypes.object.isRequired,
 		}
 
 
