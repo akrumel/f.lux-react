@@ -116,13 +116,18 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 			}
 
 			configureFinalMapShadow(store, props) {
-				const mappedShadow = mapShadowToProps(store.shadow, props, store);
-				const isFactory = typeof mappedShadow === 'function'
+				try {
+					const mappedShadow = mapShadowToProps(store.shadow, props, store);
+					const isFactory = typeof mappedShadow === 'function'
 
-				this.finalMapShadowToProps = isFactory ?mappedShadow :mapShadowToProps;
-				this.doShadowPropsDependOnOwnProps = this.finalMapShadowToProps.length !== 1;
+					this.finalMapShadowToProps = isFactory ?mappedShadow :mapShadowToProps;
+					this.doShadowPropsDependOnOwnProps = this.finalMapShadowToProps.length !== 1;
 
-				return isFactory ?this.computeShadowProps(store.shadow, props, store) :mappedShadow;
+					return isFactory ?this.computeShadowProps(store.shadow, props, store) :mappedShadow;
+				} catch(ex) {
+					console.warn("storeContainer shadow-props error", ex);
+					throw ex;
+				}
 			}
 
 			getWrappedInstance() {
