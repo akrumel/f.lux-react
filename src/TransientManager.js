@@ -18,7 +18,8 @@ export default class TransientManager {
 			this.transLock = trans.lock(this.name);
 			this.transId = trans.id;
 
-			this.onTransChange(this.transId, trans);
+			// give react and f.lux a chance to settle
+			setTimeout( () => this.onTransChange(this.transId, trans) );
 		}
 	}
 
@@ -36,7 +37,8 @@ export default class TransientManager {
 			this.transLock = null;
 			this.transId = null;
 
-			this.onTransChange(null, null);
+			// give react and f.lux a chance to settle
+			setTimeout( () => this.onTransChange(null, null) );
 		}
 	}
 }
