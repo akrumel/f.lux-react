@@ -59,6 +59,26 @@ var nextVersion = 0;
 		Not searched: this.props.user is null/undefined and this.props.isSearchingUser() returns false
 		searching: this.props.isSearchingUser() returns true
 		Searched: this.props.user contains the model instance and this.isSearchingUser() returns false
+
+	Example:
+		const Comp = storeContainer(mapShadowToProps)(
+		searchContainer(
+			"accountList",
+			"accountLists",
+			{
+				find(alCollection, props) {
+					const model = alCollection.findModel( m => m.list_def_id === props.list_def_id);
+
+					return model ?[model] :null;
+				},
+				searchOn(qb, props) {
+					qb.equals("list_def_id", props.list_def_id)
+				},
+				single: true,
+			}
+		)(UiComp)
+);
+
 */
 export default function searchContainer(modelsName, collectionPropName, options={}) {
 	const { find, searchOn, single=false, withRef=false } = options;

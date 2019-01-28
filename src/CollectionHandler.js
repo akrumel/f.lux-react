@@ -180,7 +180,7 @@ export default class CollectionHandler {
 	}
 
 	_syncCollection(collection, mergeOp) {
-		InteractionManager.runAfterInteractions( () => {
+//		InteractionManager.runAfterInteractions( () => {
 			const { collectionPropName, container, page } = this;
 
 			if (!collection || !collection.isConnected() || this.syncCalled(collection) || collection.restoring) {
@@ -205,6 +205,6 @@ export default class CollectionHandler {
 					.catch( error => this.restoreOnError(error) )
 					.catch( error => this.fetchError(error) );
 			}
-		});
+//		});
 	}
 }
