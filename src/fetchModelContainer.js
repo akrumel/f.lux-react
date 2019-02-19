@@ -175,16 +175,11 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 			}
 
 			fetchModel = (modelId, force=false) => {
+				const time = Date.now();
+
 				modelId = modelId || this.idPropValue();
 
-				if ((this.startFetchTime || this.modelId == modelId) && !force) { return }
-
-				invariant(this.collection, `Could not find "${collectionPropName}"" in the props of ` +
-					`<${this.constructor.displayName}>. Wrap the root component in a storeContainer(), or explicitly ` +
-					`pass "${collectionPropName}" collection as a prop to <${this.constructor.displayName}>.`
-				)
-
-				const time = Date.now();
+				if (!this.collection || ((this.startFetchTime || this.modelId == modelId) && !force)) { return }
 
 				this.model = null;
 				this.modelId = modelId;
