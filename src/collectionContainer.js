@@ -89,6 +89,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 						acc[`${h.collectionPropName}Error`] = h.error;
 						acc[`clear${capitalize(h.collectionPropName)}Error`] = h.clearErrorAndResync;
 						acc[`sync${capitalize(h.collectionPropName)}`] = h.sync;
+						acc[`resync${capitalize(h.collectionPropName)}`] = h.resync;
 
 						return acc;
 					}, {});

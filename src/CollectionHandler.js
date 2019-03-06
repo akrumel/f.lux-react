@@ -131,6 +131,7 @@ export default class CollectionHandler {
 		}
 	}
 
+	@autobind
 	resync(collection=this.collection) {
 		const { collectionPropName, container } = this;
 

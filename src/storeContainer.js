@@ -35,7 +35,7 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 	const finalInitialStoreProps = initialStoreProps || defaultInitialStoreProps;
 	const finalMergeProps = mergeProps || defaultMergeProps
 	const checkMergedEquals = finalMergeProps !== defaultMergeProps
-	const { pure = true, withRef = false } = options;
+	const { propsChanged=()=>true, pure = true, withRef = false } = options;
 
 	// Helps track hot reloading.
 	const version = nextVersion++;
@@ -147,7 +147,7 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 			}
 
 			@autobind
-			handleChange() {
+			handleChange(store, shadow, prevShadow) {
 				if (!this.subscribed) { return }
 
 				if (!this.state.defaultStorePropsSet) {
@@ -156,10 +156,7 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 					})
 				}
 
-				const prevShadow = this.state.shadow;
-				const shadow = this.store.shadow;
-
-				if (!pure || prevShadow !== shadow) {
+				if (!pure || propsChanged(shadow, prevShadow)) {
 					this.hasShadowChanged = true;
 					this.setState({ shadow });
 				}
@@ -173,7 +170,7 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 				if (shouldSubscribe && !this.subscribed) {
 					this.store.subscribe(this.handleChange);
 					this.subscribed = true;
-					this.handleChange();
+					this.handleChange(this.store, this.store._);
 				}
 			}
 
@@ -243,12 +240,11 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 				}
 
 				if (!haveMergedPropsChanged && renderedElement) {
-
 					return renderedElement
 				}
 
 				if (!this.state.defaultStorePropsSet) {
-					return options.renderWaiting ?options.renderWaiting(this.shadow) :null;
+					return options.renderWaiting ?options.renderWaiting(this.store.shadow) :null;
 				}
 
 				if (withRef) {

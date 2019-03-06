@@ -5,6 +5,7 @@ import React, { Component } from "react";
 
 import baseModel from "./baseModel";
 import identity from "./identity";
+import { getValidationError, validationErrorClass } from "./validationError";
 
 
 const propNamesBlacklist = [
@@ -94,13 +95,20 @@ export default class FluxSelect extends Component {
 	}
 
 	render() {
-		const { disabled, format, model } = this.props;
+		const { bind, disabled, format, model } = this.props;
 		const modelValue = this._modelValue();
 		const value = format(modelValue) || "";
 		const inputProps = omit(this.props, propNamesBlacklist);
+		const verror = getValidationError(bind, model);
+		var className = this.props.className || "";
+
+		if (verror) {
+			className = `${className} ${validationErrorClass()}`;
+		}
 
 		return <select { ...inputProps }
 				ref="select"
+				className={ className }
 				disabled={ model.$().isReadonly() || disabled }
 				value={ value }
 				onChange={ event => this._handleChange(event) }
