@@ -12,6 +12,7 @@ import result from "lodash.result";
 
 import baseModel from "./baseModel";
 import identity from "./identity";
+import { getValidationError, validationErrorClass } from "./validationError";
 
 const propNamesBlacklist = [
 	'bind',
@@ -352,10 +353,15 @@ export default class FluxWrapper extends Component {
 	}
 
 	render() {
-		const { children, disabled, format, model, onChangeTx } = this.props;
-		const className = classnames(this.props.className || '', {
-				'error': this._hasError()
-			});
+		const { bind, children, disabled, format, model, onChangeTx } = this.props;
+		var className = classnames(this.props.className || '', {
+                        'error': this._hasError()
+                });
+
+		if (getValidationError(bind, model)) {
+			className = `${className} ${validationErrorClass()}`;
+		}
+
 		const childProps = { ...omit(this.props, propNamesBlacklist), className };
 		const { value } = this.state;
 
