@@ -1,14 +1,8 @@
-import autobind from "autobind-decorator";
 import hoistStatics from "hoist-non-react-statics";
 import invariant from "invariant";
 import isPlainObject from "lodash.isplainobject";
-
-// Based on Redux connect()
-
 import PropTypes from 'prop-types';
-
 import { Component, createElement } from "react";
-
 import { shallowEqual } from "akutils";
 
 
@@ -78,18 +72,14 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 				this.trySubscribe();
 			}
 
-			componentWillReceiveProps(nextProps) {
-				if (!pure || !shallowEqual(nextProps, this.props)) {
-					this.haveOwnPropsChanged = true;
-				}
-			}
-
 			componentWillUnmount() {
 				this.tryUnsubscribe()
 				this.clearCache()
 			}
 
-			shouldComponentUpdate() {
+			shouldComponentUpdate(nextProps, nextState) {
+				this.haveOwnPropsChanged = !pure || !shallowEqual(nextProps, this.props);
+
 				return !pure || this.haveOwnPropsChanged || this.hasShadowChanged;
 			}
 
@@ -146,8 +136,7 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 				return wrapped;
 			}
 
-			@autobind
-			handleChange(store, shadow, prevShadow) {
+			handleChange = (store, shadow, prevShadow) => {
 				if (!this.subscribed) { return }
 
 				if (!this.state.defaultStorePropsSet) {
@@ -267,9 +256,8 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 			store: PropTypes.object.isRequired,
 		}
 
-
 		if (process.env.NODE_ENV !== "production") {
-			StoreContainer.prototype.componentWillUpdate = function componentWillUpdate() {
+			StoreContainer.prototype.componentDidUpdate = function componentDidUpdate() {
 				if (this.version === version) {
 					return
 				}

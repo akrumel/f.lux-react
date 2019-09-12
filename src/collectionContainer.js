@@ -56,16 +56,12 @@ export default function collectionContainer(collectionPropName, options={}) {
 				this.handlers.forEach( h => h.init() )
 			}
 
-			componentWillReceiveProps(nextProps) {
-				this.checkForCollectionChange(nextProps);
+			UNSAFE_componentWillReceiveProps(nextProps) {
+				this.handlers.forEach( h => h.checkForCollectionChange(nextProps) );
 			}
 
 			componentWillUnmount() {
 				this.mounted = false;
-			}
-
-			checkForCollectionChange(props) {
-				this.handlers.forEach( h => h.checkForCollectionChange(props) );
 			}
 
 			getWrappedInstance() {
@@ -144,7 +140,7 @@ export default function collectionContainer(collectionPropName, options={}) {
 
 
 		if (process.env.NODE_ENV !== "production") {
-			CollectionContainer.prototype.componentWillUpdate = function componentWillUpdate() {
+			CollectionContainer.prototype.componentDidUpdate = function componentDidUpdate() {
 				if (this.version === version) {
 					return
 				}

@@ -1,4 +1,3 @@
-import autobind from "autobind-decorator";
 import invariant from "invariant";
 
 import { Store } from "f.lux";
@@ -84,8 +83,7 @@ export default class CollectionHandler {
 		}
 	}
 
-	@autobind
-	clearErrorAndResync(collection=this.collection) {
+	clearErrorAndResync = (collection=this.collection) => {
 		if (!this.error) { return }
 
 		this.setState(
@@ -103,8 +101,7 @@ export default class CollectionHandler {
 		})
 	}
 
-	@autobind
-	fetchError(error) {
+	fetchError = (error) => {
 		if (this.container.mounted) {
 			this.setError(error);
 		}
@@ -120,8 +117,7 @@ export default class CollectionHandler {
 		}
 	}
 
-	@autobind
-	restoreOnError(error) {
+	restoreOnError = (error) => {
 		if (this.collection.restored) {
 			if (this.container.mounted) {
 				this.setRestored();
@@ -131,8 +127,7 @@ export default class CollectionHandler {
 		}
 	}
 
-	@autobind
-	resync(collection=this.collection) {
+	resync = (collection=this.collection) => {
 		const { collectionPropName, container } = this;
 
 		invariant(collection, `Could not find "${collectionPropName}" in the props of ` +
@@ -147,7 +142,6 @@ export default class CollectionHandler {
 
 	setError(error) {
 		const { container, errorStateName } = this;
-
 
 		this.setState({ [errorStateName]: error });
 	}
@@ -166,8 +160,7 @@ export default class CollectionHandler {
 		}
 	}
 
-	@autobind
-	sync(mergeOp) {
+	sync = (mergeOp) => {
 		this._syncCollection(this.collection, mergeOp);
 	}
 
