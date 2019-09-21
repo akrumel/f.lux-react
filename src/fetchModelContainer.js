@@ -65,6 +65,11 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 	return function wrapWithContainer(WrappedComponent) {
 		class FetchModelContainer extends Component {
+			state = {
+				isFetching: false,
+				error: null,
+			};
+
 			static contextType = ReactFluxContext;
 
 			constructor(props, context) {
@@ -79,17 +84,9 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 				this.model = null;
 				this.modelId = null;
 				this.startFetchTime = null;
-				this.mounted = true;
 				this.displayName = getDisplayName(WrappedComponent);
 				this.refreshModel = refresh;
 
-				this.state = {
-					isFetching: false,
-					error: null,
-				};
-			}
-
-			componentWillMount() {
 				this.checkForCollectionChange(this.props);
 				this.clearCache();
 			}
@@ -97,6 +94,8 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 			componentDidMount() {
 				const modelId = this.idPropValue();
 
+				this.mounted = true;
+				
 				if (modelId && this.modelId != modelId) {
 					InteractionManager.runAfterInteractions( () => this.fetchModel(modelId, true) );
 				}
@@ -106,7 +105,7 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 				this.mounted = false;
 			}
 
-			componentWillReceiveProps(nextProps) {
+			UNSAFE_componentWillReceiveProps(nextProps) {
 				this.checkForCollectionChange(nextProps);
 			}
 
@@ -214,8 +213,8 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 							if (this.mounted) {
 								this.setState({
-										isFetching: false,
-									});
+									isFetching: false,
+								});
 							}
 						})
 					.catch( error => {
@@ -226,9 +225,9 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 							if (this.mounted) {
 								this.setState({
-										isFetching: false,
-										error
-									});
+									isFetching: false,
+									error
+								});
 							}
 						}
 
@@ -306,7 +305,7 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 		}
 
 		if (process.env.NODE_ENV !== "production") {
-			FetchModelContainer.prototype.componentWillUpdate = function componentWillUpdate() {
+			FetchModelContainer.prototype.UNSAFE_componentWillUpdate = function UNSAFE_componentWillUpdate() {
 				if (this.version === version) {
 					return
 				}
