@@ -89,8 +89,8 @@ export default function searchContainer(modelsName, collectionPropName, options=
 
 	return function wrapWithContainer(WrappedComponent) {
 		class SearchContainer extends Component {
-			constructor(props, context) {
-				super(props, context);
+			constructor(props) {
+				super(props);
 
 				// Helps track hot reloading.
 				this.version = version;

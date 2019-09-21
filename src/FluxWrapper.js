@@ -13,10 +13,6 @@ import result from "lodash.result";
 import baseModel from "./baseModel";
 import identity from "./identity";
 
-const typeSpec = {
-	errors: PropTypes.object
-};
-
 const propNamesBlacklist = [
 	'bind',
 	'checkedType',
@@ -153,15 +149,6 @@ export default class FluxWrapper extends Component {
 		delete this.flushValueSet;
 	}
 
-	getChildContext () {
-		var context = this.context;
-		var props = this.props;
-
-		return {
-			errors: props.errors || context.errors || this.state.errors,
-		};
-	}
-
 	flush() {
 		return new Promise( (resolve, reject) => {
 			this.flushValue = this._updateValue( (currModel, error) => {
@@ -258,11 +245,8 @@ export default class FluxWrapper extends Component {
 
 	_hasError() {
 		const { error } = this.state;
-		const { errors } = this.context;
-		const { bind, model } = this.props;
-		const { target, key } = baseModel(model, bind);
 
-		return error || (errors && errors.hasPath(target, key));
+		return error;
 	}
 
 	_isCheckedType() {
@@ -391,10 +375,6 @@ export default class FluxWrapper extends Component {
 		return React.cloneElement(children, childProps);
 	}
 }
-
-FluxWrapper.contextTypes = typeSpec;
-FluxWrapper.childContextTypes = typeSpec;
-
 
 FluxWrapper.defaultProps = {
 	flushOnChange: false,

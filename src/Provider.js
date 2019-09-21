@@ -1,58 +1,20 @@
 // Borrowed-from/Based-on Redux Provider class (https://github.com/reactjs/react-redux/blob/master/src/components/Provider.js)
 
 import PropTypes from 'prop-types';
+import React from "react";
+import ReactFluxContext from "./Context";
 
-import { Component, Children } from "react";
 
+export default function Provider({ store, context, children }) {
+	const Context = context || ReactFluxContext;
 
-var didWarnAboutReceivingStore = false;
-
-function warnAboutReceivingStore() {
-	if (didWarnAboutReceivingStore) { return }
-
-	didWarnAboutReceivingStore = true;
-
-	if (typeof console !== 'undefined' && typeof console.error === 'function') {
-		console.error("<Provider> does not support changing `store` on the fly.");
-	}
+	return <Context.Provider value={store}>{children}</Context.Provider>
 }
 
-export default class Provider extends Component {
-	constructor(props, context) {
-		super(props, context);
-
-		this.store = props.store;
-	}
-
-	getChildContext() {
-		return {
-				store: this.store
-			};
-	}
-
-	render() {
-		const { children } = this.props;
-
-		return Children.only(children);
-	}
-}
-
-if (process.env.NODE_ENV !== 'production') {
-	Provider.prototype.componentWillReceiveProps = function (nextProps) {
-		const { store } = this;
-		const { store: nextStore } = nextProps;
-
-		if (store !== nextStore) {
-			warnAboutReceivingStore();
-		}
-	}
-}
 
 Provider.propTypes = {
 	store: PropTypes.object.isRequired,
-	children: PropTypes.element.isRequired
+	children: PropTypes.element.isRequired,
+	context: PropTypes.object,
 }
 
-Provider.childContextTypes = {
-	store: PropTypes.object.isRequired,
-}

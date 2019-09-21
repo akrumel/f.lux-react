@@ -4,6 +4,7 @@ import isPlainObject from "lodash.isplainobject";
 import PropTypes from 'prop-types';
 import { Component, createElement } from "react";
 import { shallowEqual } from "akutils";
+import ReactFluxContext from "./Context";
 
 
 const defaultInitialStoreProps = (shadow) => true;
@@ -48,11 +49,13 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 
 	return function wrapWithContainer(WrappedComponent) {
 		class StoreContainer extends Component {
+			static contextType = ReactFluxContext;
+
 			constructor(props, context) {
 				super(props, context);
 
 				this.version = version;
-				this.store = props.store || context.store;
+				this.store = this.context;
 				this.defaultStorePropsSet = false;
 
 				invariant(this.store, `Could not find f.lux Store in the context or props of ` +
@@ -251,10 +254,6 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 
 		StoreContainer.displayName = `StoreContainer(${getDisplayName(WrappedComponent)})`
 		StoreContainer.WrappedComponent = WrappedComponent
-
-		StoreContainer.contextTypes = {
-			store: PropTypes.object.isRequired,
-		}
 
 		if (process.env.NODE_ENV !== "production") {
 			StoreContainer.prototype.componentDidUpdate = function componentDidUpdate() {

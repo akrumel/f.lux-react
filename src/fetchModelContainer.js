@@ -4,6 +4,7 @@ import hoistStatics from "hoist-non-react-statics";
 import invariant from "invariant";
 
 import InteractionManager from "./InteractionManager";
+import ReactFluxContext from "./Context";
 
 
 // http://stackoverflow.com/questions/1026069/capitalize-the-first-letter-of-string-in-javascript
@@ -64,13 +65,15 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 
 	return function wrapWithContainer(WrappedComponent) {
 		class FetchModelContainer extends Component {
+			static contextType = ReactFluxContext;
+
 			constructor(props, context) {
 				super(props, context);
 
 				// Helps track hot reloading.
 				this.version = version;
 
-				this.store = props.store || context.store;
+				this.store = this.context;
 				this.collection = props[collectionPropName];
 				this.endpointId = this.collection && this.collection.endpoint.id;
 				this.model = null;
@@ -301,10 +304,6 @@ export default function fetchModelContainer(modelName, collectionPropName, optio
 		FetchModelContainer.propTypes = {
 			[collectionPropName]: PropTypes.object,
 		}
-		FetchModelContainer.contextTypes = {
-			store: PropTypes.object.isRequired,
-		}
-
 
 		if (process.env.NODE_ENV !== "production") {
 			FetchModelContainer.prototype.componentWillUpdate = function componentWillUpdate() {
