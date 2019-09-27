@@ -2,7 +2,7 @@ import hoistStatics from "hoist-non-react-statics";
 import invariant from "invariant";
 import isPlainObject from "lodash.isplainobject";
 import PropTypes from 'prop-types';
-import { Component, createElement } from "react";
+import React, { Component, createElement } from "react";
 import { shallowEqual } from "akutils";
 import ReactFluxContext from "./Context";
 
@@ -30,7 +30,7 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 	const finalInitialStoreProps = initialStoreProps || defaultInitialStoreProps;
 	const finalMergeProps = mergeProps || defaultMergeProps
 	const checkMergedEquals = finalMergeProps !== defaultMergeProps
-	const { propsChanged=()=>true, pure = true, withRef = false } = options;
+	const { propsChanged=()=>true, pure = true, withRef = false, forwardRef } = options;
 
 	// Helps track hot reloading.
 	const version = nextVersion++;
@@ -245,7 +245,16 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 							ref: 'wrappedInstance'
 						});
 				} else {
-					this.renderedElement = createElement(WrappedComponent, this.mergedProps);
+					const { forwardedRef, ...props } = this.mergedProps;
+					this.renderedElement = createElement(
+						WrappedComponent, 
+						{
+							...props,
+							ref: forwardedRef,
+						}
+					);
+
+//					this.renderedElement = createElement(WrappedComponent, this.mergedProps);
 				}
 
 				return this.renderedElement;
@@ -255,22 +264,50 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 		StoreContainer.displayName = `StoreContainer(${getDisplayName(WrappedComponent)})`
 		StoreContainer.WrappedComponent = WrappedComponent
 
-		if (process.env.NODE_ENV !== "production") {
-			StoreContainer.prototype.componentDidUpdate = function componentDidUpdate() {
-				if (this.version === version) {
-					return
-				}
+		if (forwardRef) {
+		      const forwarded = React.forwardRef(function forwardStoreRef(props, ref) {
+			        return <StoreContainer {...props} forwardedRef={ref} />
+			      })
 
-				// We are hot reloading!
-				this.version = version
-				this.trySubscribe()
-				this.clearCache()
-			}
+		      forwarded.displayName = `StoreContainer(${getDisplayName(WrappedComponent)})`;
+		      forwarded.WrappedComponent = WrappedComponent;
 
-
-			return hoistStatics(StoreContainer, WrappedComponent)
-		} else {
-			return StoreContainer;
+		      return hoistStatics(forwarded, WrappedComponent)
 		}
+
+		return hoistStatics(StoreContainer, WrappedComponent);
+
+// 		if (process.env.NODE_ENV !== "production") {
+// 			StoreContainer.prototype.componentDidUpdate = function componentDidUpdate() {
+// 				if (this.version === version) {
+// 					return
+// 				}
+
+// 				// We are hot reloading!
+// 				this.version = version
+// 				this.trySubscribe()
+// 				this.clearCache()
+// 			}
+
+// 			if (forwardRef) {
+// 			      const forwarded = React.forwardRef(function forwardStoreRef(props, ref) {
+// 				        return <StoreContainer {...props} forwardedRef={ref} />
+// 				      })
+
+// 			      forwarded.displayName = `StoreContainer(${getDisplayName(WrappedComponent)})`;
+// 			      forwarded.WrappedComponent = WrappedComponent;
+
+// 			      return hoistStatics(forwarded, WrappedComponent)
+// 			}
+
+// 			return hoistStatics(StoreContainer, WrappedComponent)
+// 		} else {
+// 			if (forwardRef) {
+// 			return React.forwardRef((props, ref) => {
+// 			    return <StoreContainer {...props} forwardedRef={ref} />;
+// 			  });
+
+// //			return StoreContainer;
+// 		}
 	}
 }
