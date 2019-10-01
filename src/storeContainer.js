@@ -253,8 +253,6 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 							ref: forwardedRef,
 						}
 					);
-
-//					this.renderedElement = createElement(WrappedComponent, this.mergedProps);
 				}
 
 				return this.renderedElement;
@@ -276,38 +274,5 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 		}
 
 		return hoistStatics(StoreContainer, WrappedComponent);
-
-// 		if (process.env.NODE_ENV !== "production") {
-// 			StoreContainer.prototype.componentDidUpdate = function componentDidUpdate() {
-// 				if (this.version === version) {
-// 					return
-// 				}
-
-// 				// We are hot reloading!
-// 				this.version = version
-// 				this.trySubscribe()
-// 				this.clearCache()
-// 			}
-
-// 			if (forwardRef) {
-// 			      const forwarded = React.forwardRef(function forwardStoreRef(props, ref) {
-// 				        return <StoreContainer {...props} forwardedRef={ref} />
-// 				      })
-
-// 			      forwarded.displayName = `StoreContainer(${getDisplayName(WrappedComponent)})`;
-// 			      forwarded.WrappedComponent = WrappedComponent;
-
-// 			      return hoistStatics(forwarded, WrappedComponent)
-// 			}
-
-// 			return hoistStatics(StoreContainer, WrappedComponent)
-// 		} else {
-// 			if (forwardRef) {
-// 			return React.forwardRef((props, ref) => {
-// 			    return <StoreContainer {...props} forwardedRef={ref} />;
-// 			  });
-
-// //			return StoreContainer;
-// 		}
 	}
 }
