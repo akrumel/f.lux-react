@@ -1,4 +1,3 @@
-import autobind from "autobind-decorator";
 import hoistStatics from "hoist-non-react-statics";
 import invariant from "invariant";
 import PropTypes from 'prop-types';

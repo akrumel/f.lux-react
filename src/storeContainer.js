@@ -21,9 +21,6 @@ function getDisplayName(WrappedComponent) {
 			'Component';
 }
 
-// Helps track hot reloading.
-var nextVersion = 0;
-
 
 export default function storeContainer(mapShadowToProps, initialStoreProps, mergeProps, options = {}) {
 	const shouldSubscribe = Boolean(mapShadowToProps);
@@ -31,9 +28,6 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 	const finalMergeProps = mergeProps || defaultMergeProps
 	const checkMergedEquals = finalMergeProps !== defaultMergeProps
 	const { propsChanged=()=>true, pure = true, withRef = false, forwardRef } = options;
-
-	// Helps track hot reloading.
-	const version = nextVersion++;
 
 	function computeMergedProps(stateProps, parentProps, containerProps) {
 		const mergedProps = finalMergeProps(stateProps, parentProps, containerProps);
@@ -54,7 +48,6 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 			constructor(props, context) {
 				super(props, context);
 
-				this.version = version;
 				this.store = this.context;
 				this.defaultStorePropsSet = false;
 
@@ -247,7 +240,7 @@ export default function storeContainer(mapShadowToProps, initialStoreProps, merg
 				} else {
 					const { forwardedRef, ...props } = this.mergedProps;
 					this.renderedElement = createElement(
-						WrappedComponent, 
+						WrappedComponent,
 						{
 							...props,
 							ref: forwardedRef,

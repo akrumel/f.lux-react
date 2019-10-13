@@ -11,3 +11,5 @@ export { default as TransientManager } from "./TransientManager";
 export { default as FluxInput } from "./FluxInput";
 export { default as FluxSelect } from "./FluxSelect";
 export { default as FluxWrapper } from "./FluxWrapper";
+
+export { default as ReactFluxContext } from "./Context";
